@@ -2,15 +2,15 @@ package model;
 
 public class Superblock {
     //超级块
-    int root;   //根目录位置
+    private int root;   //根目录位置
     //空闲栈
-    int emptyUserBlock;	//空用户块
-    int emptyDirBlock;	//空目录块
-    int _emptyDirBlock; //空目录块最后一块
-    int emptyFileBlock;	//空文件块
-    int _emptyFileBlock;//空文件块最后一块
-    int emptyIndexBlock;//空索引块
-    int _emptyIndexBlock;//空索引块最后一块
+    private int emptyUserBlock;	//空用户块
+    private int emptyDirBlock;	//空目录块
+    private int _emptyDirBlock; //空目录块最后一块
+    private int emptyFileBlock;	//空文件块
+    private int _emptyFileBlock;//空文件块最后一块
+    private int emptyIndexBlock;//空索引块
+    private int _emptyIndexBlock;//空索引块最后一块
 
     public int getRoot() {
         return root;

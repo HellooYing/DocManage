@@ -2,14 +2,14 @@ package model;
 
 public class DirBlock {
     //目录文件
-    String dirName; //目录名
-    int bfcb; //目录所指向的i节点号
+    private String dirName; //目录名
+    private int bfcb; //目录所指向的i节点号
 
-    int faDirId; //父亲目录id
-    int sonDirId; //儿子目录id
-    int nextDirId; //下一个目录id(兄弟节点)
+    private int faDirId; //父亲目录id
+    private int sonDirId; //儿子目录id
+    private int nextDirId; //下一个目录id(兄弟节点)
 
-    int used; //是否空闲
+    private boolean used; //是否空闲
 
     public String getDirName() {
         return dirName;
@@ -51,11 +51,11 @@ public class DirBlock {
         this.nextDirId = nextDirId;
     }
 
-    public int getUsed() {
+    public boolean isUsed() {
         return used;
     }
 
-    public void setUsed(int used) {
+    public void setUsed(boolean used) {
         this.used = used;
     }
 }

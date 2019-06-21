@@ -2,10 +2,10 @@ package model;
 
 public class UserInfo {
     //用来存储用户信息的块
-    String userName; //用户名称
-    String pwd; //密码
-    int mod; //权限
-    int dirBlockId; //用户根目录id
+    private String userName; //用户名称
+    private String pwd; //密码
+    private int mod; //权限
+    private int dirBlockId; //用户根目录id
 
     public String getUserName() {
         return userName;
