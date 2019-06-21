@@ -8,6 +8,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class FastJsonTest {
+    /**
+     * 测试FastJson是否能正常序列化和反序列化类
+     */
     @Test
     public void test1(){
         DataBlock dataBlock = new DataBlock();
