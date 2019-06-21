@@ -1,4 +1,4 @@
-package model;
+package com.NeuDocManage.model;
 
 public class UserInfo {
     //用来存储用户信息的块

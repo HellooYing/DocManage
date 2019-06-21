@@ -1,4 +1,4 @@
-package model;
+package com.NeuDocManage.model;
 
 public class DirBlock {
     //目录文件

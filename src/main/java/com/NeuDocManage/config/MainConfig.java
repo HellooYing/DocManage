@@ -1,4 +1,4 @@
-package config;
+package com.NeuDocManage.config;
 
 /**
  * 一些最基础的配置

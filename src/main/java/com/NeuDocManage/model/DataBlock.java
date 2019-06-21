@@ -1,4 +1,4 @@
-package model;
+package com.NeuDocManage.model;
 
 public class DataBlock {
     //磁盘文件块,记录数据

@@ -1,4 +1,4 @@
-package model;
+package com.NeuDocManage.model;
 
 public class Superblock {
     //超级块

@@ -1,12 +1,12 @@
-package test;
+package com.NeuDocManage;
 
+import com.NeuDocManage.service.DiskService;
 import org.junit.Test;
-import service.DiskService;
 
 import java.io.IOException;
 
+import static com.NeuDocManage.service.BlockService.*;
 import static org.junit.Assert.assertEquals;
-import static service.BlockService.*;
 
 public class BlockServiceTest {
     @Test

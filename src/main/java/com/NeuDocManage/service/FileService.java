@@ -1,4 +1,4 @@
-package service;
+package com.NeuDocManage.service;
 
 public class FileService {
     //文件有关操作

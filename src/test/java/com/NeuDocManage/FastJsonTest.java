@@ -1,7 +1,8 @@
-package test;
+package com.NeuDocManage;
 
+import com.NeuDocManage.model.DataBlock;
 import com.alibaba.fastjson.JSON;
-import model.DataBlock;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

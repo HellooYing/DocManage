@@ -1,12 +1,11 @@
-package service;
+package com.NeuDocManage.service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
-import static config.MainConfig.*;
+import static com.NeuDocManage.config.MainConfig.DISKSIZE;
 
 public class DiskService {
     public static MappedByteBuffer disk;

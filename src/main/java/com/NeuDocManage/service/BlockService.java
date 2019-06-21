@@ -1,13 +1,12 @@
-package service;
+package com.NeuDocManage.service;
 
 import java.nio.MappedByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
-import static config.MainConfig.*;
+import static com.NeuDocManage.config.MainConfig.BLOCKSIZE;
+
 
 public class BlockService {
-    public static MappedByteBuffer disk=DiskService.disk;
+    public static MappedByteBuffer disk= DiskService.disk;
     /**
      * 读盘块，输入盘块号，输出盘块中的内容
      * @param blockId

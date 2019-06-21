@@ -1,4 +1,4 @@
-package model;
+package com.NeuDocManage.model;
 
 import java.util.Date;
 

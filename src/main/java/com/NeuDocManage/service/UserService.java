@@ -1,6 +1,4 @@
-package service;
-
-import model.UserInfo;
+package com.NeuDocManage.service;
 
 public class UserService {
     //存取用户信息
