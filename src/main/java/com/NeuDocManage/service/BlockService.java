@@ -2,6 +2,7 @@ package com.NeuDocManage.service;
 
 import java.nio.MappedByteBuffer;
 
+import static com.NeuDocManage.config.MainConfig.BLOCKNUM;
 import static com.NeuDocManage.config.MainConfig.BLOCKSIZE;
 
 
@@ -13,6 +14,10 @@ public class BlockService {
      * @return content
      */
     public static String readBlock(int blockId){
+        if(blockId>=BLOCKNUM){
+            System.out.println("盘块号大于总盘块数错误。");
+            System.exit(0);
+        }
         int position=blockId*BLOCKSIZE;
         StringBuilder content=new StringBuilder();
         for (int i = position; i <position+BLOCKSIZE ; i++) {
