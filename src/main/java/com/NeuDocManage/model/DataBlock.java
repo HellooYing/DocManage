@@ -4,6 +4,17 @@ public class DataBlock {
     //磁盘文件块,记录数据
     private String data; //数据区
     private int nextDataId; //下一块文件id
+
+    public DataBlock(String data, int nextDataId, boolean used) {
+        this.data = data;
+        this.nextDataId = nextDataId;
+        this.used = used;
+    }
+
+    public DataBlock() {
+
+    }
+
     private boolean used; //是否空闲
 
     public String getData() {

@@ -2,17 +2,17 @@ package com.NeuDocManage.model;
 
 public class UserInfo {
     //用来存储用户信息的块
-    private String userName; //用户名称
-    private String pwd; //密码
+    private String userName; //用户名称，长度<20
+    private String pwd; //密码,长度<20
     private int mod; //权限
-    private int dirBlockId; //用户根目录id
+    private int inode; //用户根目录i节点
 
     public String getUserName() {
         return userName;
     }
 
     public void setUserName(String userName) {
-        userName = userName;
+        this.userName = userName;
     }
 
     public String getPwd() {
@@ -20,7 +20,7 @@ public class UserInfo {
     }
 
     public void setPwd(String pwd) {
-        pwd = pwd;
+        this.pwd = pwd;
     }
 
     public int getMod() {
@@ -28,14 +28,14 @@ public class UserInfo {
     }
 
     public void setMod(int mod) {
-        mod = mod;
+        this.mod = mod;
     }
 
-    public int getDirBlockId() {
-        return dirBlockId;
+    public int getInode() {
+        return inode;
     }
 
-    public void setDirBlockId(int dirBlockId) {
-        dirBlockId = dirBlockId;
+    public void setInode(int inode) {
+        this.inode = inode;
     }
 }
