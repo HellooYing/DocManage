@@ -9,7 +9,7 @@ public class DirBlock {
     private int sonDirId; //儿子目录id
     private int nextDirId; //下一个目录id(兄弟节点)
 
-    private int used; //是否空闲
+    private boolean used; //是否空闲
 
     public String getDirName() {
         return dirName;
@@ -51,11 +51,11 @@ public class DirBlock {
         this.nextDirId = nextDirId;
     }
 
-    public int getUsed() {
+    public boolean isUsed() {
         return used;
     }
 
-    public void setUsed(int used) {
+    public void setUsed(boolean used) {
         this.used = used;
     }
 }

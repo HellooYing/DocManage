@@ -4,7 +4,7 @@ public class DataBlock {
     //磁盘文件块,记录数据
     private String data; //数据区
     private int nextDataId; //下一块文件id
-    private int used; //是否空闲
+    private boolean used; //是否空闲
 
     public String getData() {
         return data;
@@ -22,11 +22,11 @@ public class DataBlock {
         this.nextDataId = nextDataId;
     }
 
-    public int getUsed() {
+    public boolean isUsed() {
         return used;
     }
 
-    public void setUsed(int used) {
+    public void setUsed(boolean used) {
         this.used = used;
     }
 }

@@ -9,7 +9,7 @@ public class IndexNode {
     //文件说明信息
     private int type; //文件类型 1:目录 2:文件 3:硬链接 4:软链接
     private int mode; //权限
-    private int used; //是否空闲
+    private boolean used; //是否空闲
     private int size; //对应文件大小
 
     private String name; //文件名称/目录名称
@@ -46,11 +46,11 @@ public class IndexNode {
         this.mode = mode;
     }
 
-    public int getUsed() {
+    public boolean isUsed() {
         return used;
     }
 
-    public void setUsed(int used) {
+    public void setUsed(boolean used) {
         this.used = used;
     }
 
