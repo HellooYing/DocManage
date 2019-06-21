@@ -4,30 +4,30 @@ import java.util.Date;
 
 public class IndexNode {
     //i节点(索引)
-    int Id; //索引号
+    private int id; //索引号
 
     //文件说明信息
-    int type; //文件类型 1:目录 2:文件 3:硬链接 4:软链接
-    int Mode; //权限
-    int Used; //是否空闲
-    int Size; //对应文件大小
+    private int type; //文件类型 1:目录 2:文件 3:硬链接 4:软链接
+    private int mode; //权限
+    private int used; //是否空闲
+    private int size; //对应文件大小
 
-    String Name; //文件名称/目录名称
-    String Creator; //创建者
+    private String name; //文件名称/目录名称
+    private String creator; //创建者
 
-    Date CreateTime; //创建日期
-    Date ChangeTime; //最后一次修改时间
+    private Date createTime; //创建日期
+    private Date changeTime; //最后一次修改时间
 
     //索引地址
-    int Offset; //存放磁盘块的直接地址（磁盘偏移量）
-    int IndirectData; //存放一个间接索引地址（指向i节点)
+    private int offset; //存放磁盘块的直接地址（磁盘偏移量）
+    private int indirectData; //存放一个间接索引地址（指向i节点)
 
     public int getId() {
-        return Id;
+        return id;
     }
 
-    public void setId(int Id) {
-        this.Id = Id;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getType() {
@@ -39,74 +39,74 @@ public class IndexNode {
     }
 
     public int getMode() {
-        return Mode;
+        return mode;
     }
 
     public void setMode(int mode) {
-        Mode = mode;
+        this.mode = mode;
     }
 
     public int getUsed() {
-        return Used;
+        return used;
     }
 
     public void setUsed(int used) {
-        Used = used;
+        this.used = used;
     }
 
     public int getSize() {
-        return Size;
+        return size;
     }
 
     public void setSize(int size) {
-        Size = size;
+        this.size = size;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public String getCreator() {
-        return Creator;
+        return creator;
     }
 
     public void setCreator(String creator) {
-        Creator = creator;
+        this.creator = creator;
     }
 
     public Date getCreateTime() {
-        return CreateTime;
+        return createTime;
     }
 
     public void setCreateTime(Date createTime) {
-        CreateTime = createTime;
+        this.createTime = createTime;
     }
 
     public Date getChangeTime() {
-        return ChangeTime;
+        return changeTime;
     }
 
     public void setChangeTime(Date changeTime) {
-        ChangeTime = changeTime;
+        this.changeTime = changeTime;
     }
 
     public int getOffset() {
-        return Offset;
+        return offset;
     }
 
     public void setOffset(int offset) {
-        Offset = offset;
+        this.offset = offset;
     }
 
     public int getIndirectData() {
-        return IndirectData;
+        return indirectData;
     }
 
     public void setIndirectData(int indirectData) {
-        IndirectData = indirectData;
+        this.indirectData = indirectData;
     }
 }

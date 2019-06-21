@@ -2,40 +2,40 @@ package model;
 
 public class UserInfo {
     //用来存储用户信息的块
-    String UserName; //用户名称
-    String Pwd; //密码
-    int Mod; //权限
-    int DirBlockId; //用户根目录id
+    private String userName; //用户名称
+    private String pwd; //密码
+    private int mod; //权限
+    private int dirBlockId; //用户根目录id
 
     public String getUserName() {
-        return UserName;
+        return userName;
     }
 
     public void setUserName(String userName) {
-        UserName = userName;
+        userName = userName;
     }
 
     public String getPwd() {
-        return Pwd;
+        return pwd;
     }
 
     public void setPwd(String pwd) {
-        Pwd = pwd;
+        pwd = pwd;
     }
 
     public int getMod() {
-        return Mod;
+        return mod;
     }
 
     public void setMod(int mod) {
-        Mod = mod;
+        mod = mod;
     }
 
     public int getDirBlockId() {
-        return DirBlockId;
+        return dirBlockId;
     }
 
     public void setDirBlockId(int dirBlockId) {
-        DirBlockId = dirBlockId;
+        dirBlockId = dirBlockId;
     }
 }
