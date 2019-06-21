@@ -2,24 +2,24 @@ package model;
 
 public class DataBlock {
     //磁盘文件块,记录数据
-    String Data; //数据区
-    int NextDataId; //下一块文件id
+    String data; //数据区
+    int nextDataId; //下一块文件id
     int used; //是否空闲
 
     public String getData() {
-        return Data;
+        return data;
     }
 
     public void setData(String data) {
-        Data = data;
+        this.data = data;
     }
 
     public int getNextDataId() {
-        return NextDataId;
+        return nextDataId;
     }
 
     public void setNextDataId(int nextDataId) {
-        NextDataId = nextDataId;
+        this.nextDataId = nextDataId;
     }
 
     public int getUsed() {

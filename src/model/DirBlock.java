@@ -2,60 +2,60 @@ package model;
 
 public class DirBlock {
     //目录文件
-    String DirName; //目录名
-    int Bfcb; //目录所指向的i节点号
+    String dirName; //目录名
+    int bfcb; //目录所指向的i节点号
 
-    int FaDirId; //父亲目录id
-    int SonDirId; //儿子目录id
-    int NextDirId; //下一个目录id(兄弟节点)
+    int faDirId; //父亲目录id
+    int sonDirId; //儿子目录id
+    int nextDirId; //下一个目录id(兄弟节点)
 
-    int Used; //是否空闲
+    int used; //是否空闲
 
     public String getDirName() {
-        return DirName;
+        return dirName;
     }
 
     public void setDirName(String dirName) {
-        DirName = dirName;
+        this.dirName = dirName;
     }
 
     public int getBfcb() {
-        return Bfcb;
+        return bfcb;
     }
 
     public void setBfcb(int bfcb) {
-        Bfcb = bfcb;
+        this.bfcb = bfcb;
     }
 
     public int getFaDirId() {
-        return FaDirId;
+        return faDirId;
     }
 
     public void setFaDirId(int faDirId) {
-        FaDirId = faDirId;
+        this.faDirId = faDirId;
     }
 
     public int getSonDirId() {
-        return SonDirId;
+        return sonDirId;
     }
 
     public void setSonDirId(int sonDirId) {
-        SonDirId = sonDirId;
+        this.sonDirId = sonDirId;
     }
 
     public int getNextDirId() {
-        return NextDirId;
+        return nextDirId;
     }
 
     public void setNextDirId(int nextDirId) {
-        NextDirId = nextDirId;
+        this.nextDirId = nextDirId;
     }
 
     public int getUsed() {
-        return Used;
+        return used;
     }
 
     public void setUsed(int used) {
-        Used = used;
+        this.used = used;
     }
 }
