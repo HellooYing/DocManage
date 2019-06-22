@@ -37,6 +37,7 @@ public class DiskService {
                     otherDataBlock.append(j+",");
                 }
                 if(i+100<BLOCKNUM) otherDataBlock.append(i+100);
+                else otherDataBlock.deleteCharAt(otherDataBlock.length()-1);
                 writeBlock(i,otherDataBlock.toString());
             }
             writeBlock(BLOCKNUM-1,"0");
@@ -46,6 +47,7 @@ public class DiskService {
             }
             otherInodeBlock.append(INODEBLOCKSTART+INODEBLOCKNUM-1);
             writeBlock(INODEBLOCKSTART+1,otherInodeBlock.toString());
+            writeBlock(INODEBLOCKSTART+INODEBLOCKNUM-1,"0");
 
             //初始化超级块，赋默认初值
             superBlock =new SuperBlock(INODEBLOCKSTART,USERBLOCKNUM,DATABLOCKSTART,INODEBLOCKSTART+1);
