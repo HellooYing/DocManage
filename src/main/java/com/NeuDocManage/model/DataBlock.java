@@ -1,18 +1,19 @@
 package com.NeuDocManage.model;
 
-public class DataBlock {
+public class DataBlock extends Block{
     //磁盘文件块,记录数据
     private String data; //数据区
     private int nextDataId; //下一块文件id
 
     public DataBlock(String data, int nextDataId, boolean used) {
+        super("DataBlock");
         this.data = data;
         this.nextDataId = nextDataId;
         this.used = used;
     }
 
     public DataBlock() {
-
+        super("DataBlock");
     }
 
     private boolean used; //是否空闲

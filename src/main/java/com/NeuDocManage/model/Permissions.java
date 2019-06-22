@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Permissions {
     private int mode = 0;
+    private String userName;
 
     private boolean execute = false;//执行权限，x，1
     private final int x = (int) Math.pow(2, 0);
@@ -129,6 +130,27 @@ public class Permissions {
     public void setRead(boolean read) {
         this.read = read;
         recalculateMode();
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Permissions(boolean execute, boolean write, boolean read, String userName) {
+        this.userName=userName;
+        this.execute = execute;
+        this.write = write;
+        this.read = read;
+        recalculateMode();
+    }
+
+    public Permissions(int mode, String userName) {
+        this.userName=userName;
+        chmod(mode);
     }
 
     public Permissions(boolean execute, boolean write, boolean read) {

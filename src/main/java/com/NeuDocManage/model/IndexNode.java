@@ -1,14 +1,15 @@
 package com.NeuDocManage.model;
 
 import java.util.Date;
+import java.util.List;
 
-public class IndexNode {
+public class IndexNode extends Block{
     //i节点(索引)
     private int id; //索引号
 
     //文件说明信息
     private int type; //文件类型 1:目录 2:文件 3:硬链接 4:软链接
-    private int mode; //权限
+    private List<Permissions> mode; //权限
     private boolean used; //是否空闲
     private int size; //对应文件大小
 
@@ -21,6 +22,10 @@ public class IndexNode {
     //索引地址
     private int offset; //存放磁盘块的直接地址（磁盘偏移量）
     private int indirectData; //存放一个间接索引地址（指向i节点)
+
+    public IndexNode() {
+        super("IndexNode");
+    }
 
     public int getId() {
         return id;
@@ -38,11 +43,11 @@ public class IndexNode {
         this.type = type;
     }
 
-    public int getMode() {
+    public List<Permissions> getMode() {
         return mode;
     }
 
-    public void setMode(int mode) {
+    public void setMode(List<Permissions> mode) {
         this.mode = mode;
     }
 

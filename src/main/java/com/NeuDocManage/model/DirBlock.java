@@ -1,6 +1,6 @@
 package com.NeuDocManage.model;
 
-public class DirBlock {
+public class DirBlock extends Block {
     //目录文件
     private String dirName; //目录名
     private int bfcb; //目录所指向的i节点号
@@ -10,6 +10,10 @@ public class DirBlock {
     private int nextDirId; //下一个目录id(兄弟节点)
 
     private boolean used; //是否空闲
+
+    public DirBlock() {
+        super("DirBlock");
+    }
 
     public String getDirName() {
         return dirName;

@@ -1,6 +1,6 @@
 package com.NeuDocManage.service;
 
-import com.NeuDocManage.model.Superblock;
+import com.NeuDocManage.model.SuperBlock;
 import com.alibaba.fastjson.JSON;
 
 import java.io.File;
@@ -15,7 +15,7 @@ import static com.NeuDocManage.service.BlockService.writeBlock;
 
 public class DiskService {
     public static MappedByteBuffer disk;//磁盘
-    public static Superblock superBlock;//超级块
+    public static SuperBlock superBlock;//超级块
     /**
      * 初始化磁盘，如果没有disk.txt就创建，有则打开
      * @throws IOException
@@ -48,10 +48,10 @@ public class DiskService {
             writeBlock(INODEBLOCKSTART+1,otherInodeBlock.toString());
 
             //初始化超级块，赋默认初值
-            superBlock =new Superblock(INODEBLOCKSTART,USERBLOCKNUM,DATABLOCKSTART,INODEBLOCKSTART+1);
+            superBlock =new SuperBlock(INODEBLOCKSTART,USERBLOCKNUM,DATABLOCKSTART,INODEBLOCKSTART+1);
         }
         else{//不是第一次，就把上次的信息存到superblock类中
-            superBlock =JSON.parseObject(lastSuperBlockMessage, Superblock.class);
+            superBlock =JSON.parseObject(lastSuperBlockMessage, SuperBlock.class);
         }
     }
 

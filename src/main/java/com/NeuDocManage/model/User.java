@@ -1,6 +1,6 @@
 package com.NeuDocManage.model;
 
-public class UserInfo {
+public class User {
     //用来存储用户信息的块
     private String userName; //用户名称，长度<20
     private String pwd; //密码,长度<20

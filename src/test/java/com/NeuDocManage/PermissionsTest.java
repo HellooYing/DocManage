@@ -6,6 +6,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class PermissionsTest {
+    /**
+     * 测试Permissions类的功能，
+     * 主要有
+     * 构造函数：Permissions(7)
+     * 修改权限值：chmod(int mode)/chmod("xwr")
+     * 修改单个权限：setExecute(true)/setRead(false)/setWrite(true)
+     * 查询是否能执行、读、写：canExecute()/canRead()/canWrite()
+     */
     @Test
     public void test1(){
         Permissions permissions=new Permissions(7);

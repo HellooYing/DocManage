@@ -15,7 +15,7 @@ public class UserService {
 //
 //    }
     /*
-    UserInfo readUser(int blockId){
+    User readUser(int blockId){
         //根据blockId查询用户信息
     }
     */

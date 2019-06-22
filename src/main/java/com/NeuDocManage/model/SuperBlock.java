@@ -1,6 +1,6 @@
 package com.NeuDocManage.model;
 
-public class Superblock {
+public class SuperBlock extends Block{
     //超级块
     private int root;   //根目录位置
     //空闲栈
@@ -8,7 +8,8 @@ public class Superblock {
     private int emptyFileBlock;	//空文件块
     private int emptyIndexBlock;//空索引块
 
-    public Superblock(int root, int emptyUserBlock, int emptyFileBlock, int emptyIndexBlock) {
+    public SuperBlock(int root, int emptyUserBlock, int emptyFileBlock, int emptyIndexBlock) {
+        super("SuperBlock");
         this.root = root;
         this.emptyUserBlock = emptyUserBlock;
         this.emptyFileBlock = emptyFileBlock;
