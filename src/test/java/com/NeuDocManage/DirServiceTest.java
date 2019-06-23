@@ -23,6 +23,7 @@ public class DirServiceTest {
 
         initDisk();//初始化磁盘
         System.out.println(mkdir("name"));
+        releaseDisk();
     }
 
     /**
