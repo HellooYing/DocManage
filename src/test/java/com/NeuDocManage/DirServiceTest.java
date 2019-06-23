@@ -20,6 +20,7 @@ public class DirServiceTest {
      */
     @Test
     public void test1() throws IOException {
+
         initDisk();//初始化磁盘
         System.out.println(mkdir("name"));
         releaseDisk();
@@ -29,15 +30,20 @@ public class DirServiceTest {
      * 测试cd
      * @throws IOException
      */
-//    @Test
-//    public void test2() throws IOException{
-//
-//        initDisk();//初始化磁盘
-//        int id = mkdir("name");
-//        IndexNode inode= JSON.parseObject(readBlock(id),IndexNode.class);
-//        HostHolder.setCurDir(inode); //设置当前目录是name
-//        int id2 = mkdir("fuck");
-//        assertEquals(id,changeDir("./fuck"));
-//        releaseDisk();
-//    }
+    @Test
+    public void test2() throws IOException{
+
+        initDisk();//初始化磁盘
+        int id = mkdir("name");
+        IndexNode inode= JSON.parseObject(readBlock(id).trim(),IndexNode.class);
+        System.out.println("shit"+readBlock(id));
+        HostHolder.setCurDir(inode); //设置当前目录是name
+        int id2 = mkdir("fuck");
+        IndexNode inode2= JSON.parseObject(readBlock(id2).trim(),IndexNode.class);
+        HostHolder.setCurDir(inode2); //设置当前目录是fuck
+        int id3 = mkdir("shit");
+        HostHolder.setCurDir(inode); //设置当前目录是name
+        assertEquals(id3,changeDir("./fuck/shit"));
+        releaseDisk();
+    }
 }
