@@ -6,20 +6,25 @@ import java.util.List;
 public class DirBlock extends Block {
     //目录文件
     private String dirName; //目录名
-    private int bfcb; //目录所指向的i节点号
+    private int indexId; //目录所指向的i节点号
 
     private int faDirId; //父亲目录id
-    private List<Integer> sonDirId; //儿子目录id
+    private List<Integer> sonDirId= new ArrayList<Integer>(); //儿子目录id
     private int nextDirId; //存不下了，下一个盘区
 
-    private List<Integer> sonDataId; //当前目录下存放的文件
+    private List<Integer> sonDataId= new ArrayList<Integer>(); //当前目录下存放的文件
 
-    private boolean used; //是否空闲
+    private boolean used=false; //是否正被使用
+
+    public DirBlock(String dirName, int indexId,int faDirId) {
+        super("DirBlock");
+        this.dirName = dirName;
+        this.indexId = indexId;
+        this.faDirId = faDirId;
+    }
 
     public DirBlock() {
         super("DirBlock");
-        sonDirId = new ArrayList<Integer>();
-        sonDataId = new ArrayList<Integer>();
     }
 
     public String getDirName() {
@@ -30,12 +35,12 @@ public class DirBlock extends Block {
         this.dirName = dirName;
     }
 
-    public int getBfcb() {
-        return bfcb;
+    public int getIndexId() {
+        return indexId;
     }
 
-    public void setBfcb(int bfcb) {
-        this.bfcb = bfcb;
+    public void setIndexId(int indexId) {
+        this.indexId = indexId;
     }
 
     public int getFaDirId() {

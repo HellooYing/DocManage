@@ -77,7 +77,7 @@ public class DirService {
         //写入dirBlock信息
         DirBlock dirBlock = new DirBlock();
         dirBlock.setDirName(dirName);
-        dirBlock.setBfcb(inodeNum);
+        dirBlock.setIndexId(inodeNum);
 
         System.out.println(getCurDir().getId());
         dirBlock.setFaDirId(getCurDir().getId()); //父目录设置为当前目录，如果在初始化root目录时需要设置为空

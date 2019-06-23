@@ -1,9 +1,6 @@
 package com.NeuDocManage.service;
 
-import com.NeuDocManage.model.HostHolder;
-import com.NeuDocManage.model.IndexNode;
-import com.NeuDocManage.model.SuperBlock;
-import com.NeuDocManage.model.User;
+import com.NeuDocManage.model.*;
 import com.alibaba.fastjson.JSON;
 
 import java.io.File;
@@ -61,8 +58,12 @@ public class DiskService {
             User root=new User("root","root",7,INODEBLOCKSTART);
             writeBlock(USERBLOCKSTART,JSON.toJSONString(root));
             HostHolder.setUser(root);
-            IndexNode rootNode=new IndexNode(INODEBLOCKSTART,1,false,0,"root","root",new Date(),new Date(),0,getDataBlock());
+
+            int dirBlockId=getDataBlock();
+            IndexNode rootNode=new IndexNode(INODEBLOCKSTART,1,false,0,"root","root",new Date(),new Date(),0,dirBlockId);
             writeBlock(INODEBLOCKSTART,JSON.toJSONString(rootNode));
+            DirBlock dirBlock=new DirBlock("root",INODEBLOCKSTART,INODEBLOCKSTART);
+            writeBlock(dirBlockId,JSON.toJSONString(dirBlock));
             HostHolder.setCurDir(rootNode);
         }
         else{//不是第一次，就把上次的信息从磁盘读到superblock类中，把用户和根目录也从磁盘中读出
