@@ -13,7 +13,7 @@ public class IndexNode extends Block{
     private boolean used; //是否空闲
     private int size; //对应文件大小
 
-    private String name; //文件名称/目录名称
+    private String filename; //文件名称/目录名称
     private String creator; //创建者
 
     private Date createTime; //创建日期
@@ -67,12 +67,12 @@ public class IndexNode extends Block{
         this.size = size;
     }
 
-    public String getName() {
-        return name;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public String getCreator() {

@@ -20,10 +20,9 @@ public class DirServiceTest {
     @Test
     public void test1() throws IOException {
         DiskService.initDisk();//初始化磁盘
-        HostHolder user = new HostHolder(); //初始化用户
-        User user1 = new User();
-        user1.setUserName("mcq");
-        user.setUsers(user1);
+        User user = new User();
+        user.setUserName("mcq");
+        HostHolder.setUsers(user);
         setCurDir(SUPERBLOCKSTART+SUPERBLOCKNUM); //设置当前目录是root
         System.out.println(mkdir("name"));
     }
@@ -35,14 +34,13 @@ public class DirServiceTest {
     @Test
     public void test2() throws IOException{
         DiskService.initDisk();//初始化磁盘
-        HostHolder user = new HostHolder(); //初始化用户
-        User user1 = new User();
-        user1.setUserName("mcq");
-        user.setUsers(user1);
+        User user = new User();
+        user.setUserName("mcq");
+        HostHolder.setUsers(user);
         setCurDir(SUPERBLOCKSTART+SUPERBLOCKNUM); //设置当前目录是root
         int id = mkdir("name");
         setCurDir(id); //设置当前目录是name
         int id2 = mkdir("fuck");
-        assertEquals(id,changeDir("./fuck"));
+        assertEquals(id2,changeDir("./fuck"));
     }
 }

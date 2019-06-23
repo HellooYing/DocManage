@@ -3,7 +3,9 @@ package com.NeuDocManage.model;
 public class DataBlock extends Block{
     //磁盘文件块,记录数据
     private String data; //数据区
+    private int faDirID; //所属的目录
     private int nextDataId; //下一块文件id
+    private boolean used; //是否空闲
 
     public DataBlock(String data, int nextDataId, boolean used) {
         super("DataBlock");
@@ -16,7 +18,13 @@ public class DataBlock extends Block{
         super("DataBlock");
     }
 
-    private boolean used; //是否空闲
+    public int getFaDirID() {
+        return faDirID;
+    }
+
+    public void setFaDirID(int faDirID) {
+        this.faDirID = faDirID;
+    }
 
     public String getData() {
         return data;
