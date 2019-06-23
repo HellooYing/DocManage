@@ -36,26 +36,19 @@ public class DirService {
 
     private static int findSubDir(int dirId,String dirName){
         //找一个目录的子目录
-        System.out.println(dirId+" "+readBlock(dirId));
-        IndexNode nowInode = JSON.parseObject(readBlock(dirId), IndexNode.class);
-        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
-        if(nowDir.getSonDirId() == BLOCKNUM - 1){
-            return -1; //没找到
+        IndexNode nowInode = JSON.parseObject(readBlock(dirId).trim(), IndexNode.class);
+        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getId()).trim(), DirBlock.class);
+        if(nowDir.getSonDirId().size() == 0){
+            return -1; //没有
         }else{
-            nowInode = JSON.parseObject(readBlock(nowDir.getSonDirId()), IndexNode.class);
-            nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
-            if(nowDir.getDirName().equals(dirName)){
-                return nowInode.getId();
-            }else{
-                while(nowDir.getNextDirId() != BLOCKNUM - 1){
-                    nowInode = JSON.parseObject(readBlock(nowDir.getNextDirId()), IndexNode.class);
-                    nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
-                    if(nowDir.getDirName().equals(dirName)){
-                        return nowInode.getId();
-                    }
+            for(Integer x : nowDir.getSonDirId()){
+                nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
+                nowDir = JSON.parseObject(readBlock(nowInode.getId()).trim(), DirBlock.class);
+                if(nowDir.getDirName().equals(dirName)){
+                    return nowInode.getId();
                 }
-                return -1; //没找到
             }
+            return -1; //没有
         }
     }
 
@@ -66,19 +59,19 @@ public class DirService {
 
         //写入i节点信息
         IndexNode inode = new IndexNode();
-        inode.setId(inodeNum);
+        inode.setId(dirBlockNum);
         inode.setType(1);
         //mode是空的，表示只有root和自己能有全部权限
         inode.setUsed(true);
         inode.setSize(0); //空目录，若新建文件要在这里标记增加
 
-        inode.setName(dirName);
+        inode.setFileName(dirName);
         inode.setCreator(HostHolder.getUser().getUserName());
 
         inode.setCreateTime(new Date());
         inode.setChangeTime(new Date());
 
-        inode.setOffset(dirBlockNum);
+        //inode.setOffset(); ??
         inode.setIndirectData(inodeNum); //指向自己，如果一个目录存不下，可能会扩增，indirect指向下一个
 
         //写入dirBlock信息
@@ -87,17 +80,21 @@ public class DirService {
         dirBlock.setBfcb(inodeNum);
 
         dirBlock.setFaDirId(getCurDir().getId()); //父目录设置为当前目录，如果在初始化root目录时需要设置为空
-        dirBlock.setSonDirId(BLOCKNUM - 1); //表示没有
+
+        //新建目录以下两项都是空
+        //dirBlock.setSonDirId(BLOCKNUM - 1); //表示没有
         dirBlock.setNextDirId(BLOCKNUM - 1);   //表示没有
 
-        //寻找父亲目录的子目录最后一个，添加到尾部
-        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()), IndexNode.class);
-        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
-        while(nowDir.getNextDirId() != BLOCKNUM - 1){
-            nowInode = JSON.parseObject(readBlock(nowDir.getNextDirId()), IndexNode.class);
-            nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
-        }
-        nowDir.setNextDirId(inodeNum);
+        /*
+        //寻找父亲目录的子目录，添加到子目录(root还没有)
+        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir()).trim(), IndexNode.class);
+        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getId()).trim(), DirBlock.class);
+        List<Integer> sonDir = nowDir.getSonDirId();
+        sonDir.add(inodeNum);
+        nowDir.setSonDirId(sonDir);
+        writeBlock(getCurDir(),JSON.toJSONString(nowDir));
+         */
+
 
         dirBlock.setUsed(true);
 
@@ -135,8 +132,8 @@ public class DirService {
                     return cdAutomation(new Pair<Integer, String>(dirName.getKey(),subDirName));
                 }else if(subDir[0].equals("..")){
                     String subDirName = dirName.getValue().replace(subDir[0]+"\\/","\\/");
-                    IndexNode nowInode = JSON.parseObject(readBlock(dirName.getKey()), IndexNode.class);
-                    DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
+                    IndexNode nowInode = JSON.parseObject(readBlock(dirName.getKey()).trim(), IndexNode.class);
+                    DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getId()).trim(), DirBlock.class);
                     return cdAutomation(new Pair<Integer, String>(nowDir.getFaDirId(),subDirName));
                 }
                 return new Pair<Integer, String>(find,dirName.getValue()); //子目录里面没有
@@ -158,8 +155,8 @@ public class DirService {
         }else if(subDir[0].equals(".")){
             cur = getCurDir().getId();
         }else{
-            IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()), IndexNode.class);
-            DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
+            IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+            DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getId()).trim(), DirBlock.class);
             cur = nowDir.getFaDirId();
         }
         System.out.println(cur+" "+dirName);
@@ -175,38 +172,126 @@ public class DirService {
         //对应ls指令，列出所有子文件,存到一个List<String>里面
         //找一个目录的子目录
         List<String> result = new ArrayList<String>();
-        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()), IndexNode.class);
-        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
-        if(nowDir.getSonDirId() == BLOCKNUM - 1){
-            return result; //没有
-        }else{
-            nowInode = JSON.parseObject(readBlock(nowDir.getSonDirId()), IndexNode.class);
-            if(nowInode.getType() == 1){
-                //一个目录
-                nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
-                result.add(nowDir.getDirName()+"\\/");
-                DataBlock nowData;
-                int nextId = nowDir.getNextDirId();
-                while(nextId != BLOCKNUM - 1){
-                    nowInode = JSON.parseObject(readBlock(nowDir.getNextDirId()), IndexNode.class);
-                    if(nowInode.getType() == 1) {
-                        //一个目录
-                        nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
-                        result.add(nowDir.getDirName()+"\\/");
-                        nextId = nowDir.getNextDirId();
-                    }else{
-                        //一个文件
-                        nowData = JSON.parseObject(readBlock(nowInode.getOffset()), DataBlock.class);
-                        result.add(nowInode.getName());
-                        nextId = nowData.getNextDataId();
-                    }
-                }
-            }else{
-                //一个文件
-                result.add(nowInode.getName());
-            }
-            return result;
+        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getId()).trim(), DirBlock.class);
+        //先读取所有目录输出
+        for(Integer x : nowDir.getSonDirId()){
+            nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
+            result.add(nowInode.getFileName()+"\\/");
         }
+        //再读取所有子文件输出
+        for(Integer x : nowDir.getSonDataId()){
+            nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
+            result.add(nowInode.getFileName()+"\\/");
+        }
+        return result;
+    }
+
+    public static int createFile(String fileName) {
+        //创建一个文件,返回的是该文件的i节点号(创建失败返回BLOCKNUM - 1)
+        //对应create函数
+        int inodeNum = getIndexBlock(); //申请一个空闲i节点
+        int dataBlockNum = getDataBlock(); //申请一个空闲数据块
+
+        //写入i节点信息
+        IndexNode inode = new IndexNode();
+        inode.setId(dataBlockNum);
+        inode.setType(1);
+
+        //mode是空的，表示只有root和自己能有全部权限
+        inode.setUsed(true);
+        inode.setSize(0); //空文件，若新建文件要在这里标记增加
+
+        inode.setFileName(fileName);
+        inode.setCreator(HostHolder.getUser().getUserName());
+
+        inode.setCreateTime(new Date());
+        inode.setChangeTime(new Date());
+
+        //inode.setOffset(dataBlockNum); ??
+        inode.setIndirectData(inodeNum); //指向自己，如果一个文件存不下，可能会扩增，indirect指向下一个
+
+        //写入dataBlock信息
+        DataBlock dataBlock = new DataBlock();
+        dataBlock.setNextDataId(BLOCKNUM - 1);;   //表示没有
+        dataBlock.setFaDirID(getCurDir().getId()); //设置父亲的目录
+
+        //寻找父亲目录的子目录最后一个，添加到尾部
+        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getId()).trim(), DirBlock.class);
+        List<Integer> sons = nowDir.getSonDataId();
+        sons.add(dataBlockNum);
+        nowDir.setSonDataId(sons);
+        writeBlock(getCurDir().getId(),JSON.toJSONString(nowDir));//写回
+
+        dataBlock.setUsed(true);
+
+        //写入磁盘
+        writeBlock(inodeNum, JSON.toJSONString(inode));
+        writeBlock(dataBlockNum, JSON.toJSONString(dataBlock));
+
+        return inodeNum;
+    }
+
+//    public static boolean writeFile(String fileName,String content){
+//        //往文件里头写东西
+//        //首先找到这个文件
+//        int fileId = -1;
+//        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+//        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getId()).trim(), DirBlock.class);
+//        for(Integer x : nowDir.getSonDataId()){
+//            nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
+//            if(nowInode.getFileName().equals(fileName)){
+//                 fileId = nowInode.getId();
+//            }
+//        }
+//        if(fileId == -1){
+//            return false; //没找到
+//        }
+//        //设置content
+//        List<String> contents = new ArrayList<String>();
+//        int limit = 450;
+//        //首先判断String 长度，如果大于450，就分隔
+//        int beginIndex =  0;
+//        int endIndex = limit - 1;
+//        int length = content.length();
+//        while(length > limit){
+//            contents.add(content.substring(beginIndex,endIndex));
+//            length -= limit;
+//            beginIndex = endIndex+1;
+//            endIndex = endIndex + limit;
+//        }
+//        for (int i = 0; i < contents.size(); i++) {
+//            String nowContent = contents.get(i);
+//
+//            if(i == contents.size() - 1){
+//
+//            }else{
+//
+//            }
+//        }
+//    }
+
+    public static String readFile(String fileName){
+        //读当前目录下的某个文件,返回文件内容
+        //找子目录
+        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getId()).trim(), DirBlock.class);
+        for(Integer x : nowDir.getSonDataId()){
+            nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
+            if(nowInode.getFileName().equals(fileName)){
+                DataBlock resData = JSON.parseObject(readBlock(nowInode.getId()).trim(), DataBlock.class);
+                StringBuilder res = new StringBuilder();
+                res.append(resData.getData());
+                while(resData.getNextDataId() != BLOCKNUM - 1){
+                    nowInode = JSON.parseObject(readBlock(resData.getNextDataId()).trim(), IndexNode.class);
+                    resData = JSON.parseObject(readBlock(nowInode.getId()).trim(), DataBlock.class);
+                    res.append(resData.getData());
+                }
+                return res.toString();
+            }
+        }
+        return null; //没找到
     }
 
 }

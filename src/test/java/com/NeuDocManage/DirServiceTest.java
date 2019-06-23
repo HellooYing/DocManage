@@ -20,6 +20,7 @@ public class DirServiceTest {
      */
     @Test
     public void test1() throws IOException {
+
         initDisk();//初始化磁盘
         System.out.println(mkdir("name"));
     }
@@ -30,6 +31,7 @@ public class DirServiceTest {
      */
     @Test
     public void test2() throws IOException{
+
         initDisk();//初始化磁盘
         int id = mkdir("name");
         IndexNode inode= JSON.parseObject(readBlock(id),IndexNode.class);
