@@ -10,6 +10,11 @@ public class User {
     public User() {
     }
 
+    public User(String userName, String pwd) {
+        this.userName = userName;
+        this.pwd = pwd;
+    }
+
     public User(String userName, String pwd, int mod, int inode) {
         this.userName = userName;
         this.pwd = pwd;
