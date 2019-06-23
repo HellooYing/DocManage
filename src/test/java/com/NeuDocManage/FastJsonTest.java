@@ -2,10 +2,16 @@ package com.NeuDocManage;
 
 import com.NeuDocManage.model.Block;
 import com.NeuDocManage.model.DataBlock;
+import com.NeuDocManage.model.IndexNode;
 import com.alibaba.fastjson.JSON;
 
 import org.junit.Test;
 
+import java.io.IOException;
+
+import static com.NeuDocManage.model.HostHolder.getCurDir;
+import static com.NeuDocManage.service.BlockService.readBlock;
+import static com.NeuDocManage.service.DiskService.initDisk;
 import static org.junit.Assert.assertEquals;
 
 public class FastJsonTest {
@@ -36,5 +42,16 @@ public class FastJsonTest {
         Block block = JSON.parseObject(jsonObject, Block.class);
         assertEquals("DataBlock",block.getName());
     }
+
+    /**
+     * 测试FastJson可以将反序列化从文件读出的部分
+     */
+    @Test
+    public void test3() throws IOException {
+        initDisk();
+        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+        assertEquals(1,nowInode.getId());
+    }
+
 }
 

@@ -1,15 +1,16 @@
 package com.NeuDocManage;
 
 import com.NeuDocManage.model.HostHolder;
-import com.NeuDocManage.model.User;
-import com.NeuDocManage.service.DiskService;
+import com.NeuDocManage.model.IndexNode;
+import com.alibaba.fastjson.JSON;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.NeuDocManage.config.MainConfig.SUPERBLOCKNUM;
-import static com.NeuDocManage.config.MainConfig.SUPERBLOCKSTART;
+import static com.NeuDocManage.service.BlockService.readBlock;
 import static com.NeuDocManage.service.DirService.*;
+import static com.NeuDocManage.service.DiskService.initDisk;
+import static com.NeuDocManage.service.DiskService.releaseDisk;
 import static org.junit.Assert.assertEquals;
 
 public class DirServiceTest {
@@ -19,12 +20,7 @@ public class DirServiceTest {
      */
     @Test
     public void test1() throws IOException {
-        DiskService.initDisk();//初始化磁盘
-        HostHolder user = new HostHolder(); //初始化用户
-        User user1 = new User();
-        user1.setUserName("mcq");
-        user.setUsers(user1);
-        setCurDir(SUPERBLOCKSTART+SUPERBLOCKNUM); //设置当前目录是root
+        initDisk();//初始化磁盘
         System.out.println(mkdir("name"));
     }
 
@@ -34,15 +30,12 @@ public class DirServiceTest {
      */
     @Test
     public void test2() throws IOException{
-        DiskService.initDisk();//初始化磁盘
-        HostHolder user = new HostHolder(); //初始化用户
-        User user1 = new User();
-        user1.setUserName("mcq");
-        user.setUsers(user1);
-        setCurDir(SUPERBLOCKSTART+SUPERBLOCKNUM); //设置当前目录是root
+        initDisk();//初始化磁盘
         int id = mkdir("name");
-        setCurDir(id); //设置当前目录是name
+        IndexNode inode= JSON.parseObject(readBlock(id),IndexNode.class);
+        HostHolder.setCurDir(inode); //设置当前目录是name
         int id2 = mkdir("fuck");
         assertEquals(id,changeDir("./fuck"));
+        releaseDisk();
     }
 }

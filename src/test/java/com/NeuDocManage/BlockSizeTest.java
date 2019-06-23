@@ -17,4 +17,13 @@ public class BlockSizeTest {
         DataBlock dataBlock = new DataBlock();
         System.out.println(JSON.toJSONString((dataBlock)).length());
     }
+
+    /**
+     * 测试Inode节点最大为多大
+     * @throws IOException
+     */
+    @Test
+    public void test2() throws IOException {
+
+    }
 }

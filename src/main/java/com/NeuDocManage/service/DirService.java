@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.NeuDocManage.config.MainConfig.*;
+import static com.NeuDocManage.model.HostHolder.getCurDir;
 import static com.NeuDocManage.service.BlockService.readBlock;
 import static com.NeuDocManage.service.BlockService.writeBlock;
 import static com.NeuDocManage.service.DataService.getDataBlock;
@@ -22,16 +23,16 @@ public class DirService {
     //目录有关操作
     //下面三个都是假的!
 
-    private static int CurDir = 1;
-
-    public static void setCurDir(int dirId){
-        CurDir = dirId;
-    }
-
-    private static int getCurDir(){
-        //假的
-        return CurDir;
-    }
+//    private static int CurDir = 1;
+//
+//    public static void setCurDir(int dirId){
+//        CurDir = dirId;
+//    }
+//
+//    private static int getCurDir(){
+//        //假的
+//        return CurDir;
+//    }
 
     private static int findSubDir(int dirId,String dirName){
         //找一个目录的子目录
@@ -85,12 +86,12 @@ public class DirService {
         dirBlock.setDirName(dirName);
         dirBlock.setBfcb(inodeNum);
 
-        dirBlock.setFaDirId(getCurDir()); //父目录设置为当前目录，如果在初始化root目录时需要设置为空
+        dirBlock.setFaDirId(getCurDir().getId()); //父目录设置为当前目录，如果在初始化root目录时需要设置为空
         dirBlock.setSonDirId(BLOCKNUM - 1); //表示没有
         dirBlock.setNextDirId(BLOCKNUM - 1);   //表示没有
 
         //寻找父亲目录的子目录最后一个，添加到尾部
-        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir()), IndexNode.class);
+        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()), IndexNode.class);
         DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
         while(nowDir.getNextDirId() != BLOCKNUM - 1){
             nowInode = JSON.parseObject(readBlock(nowDir.getNextDirId()), IndexNode.class);
@@ -155,9 +156,9 @@ public class DirService {
         if(!subDir[0].equals(".") && !subDir[0].equals("..")) {
             dirName.replace("\\/roor\\/","");
         }else if(subDir[0].equals(".")){
-            cur = getCurDir();
+            cur = getCurDir().getId();
         }else{
-            IndexNode nowInode = JSON.parseObject(readBlock(getCurDir()), IndexNode.class);
+            IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()), IndexNode.class);
             DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
             cur = nowDir.getFaDirId();
         }
@@ -174,7 +175,7 @@ public class DirService {
         //对应ls指令，列出所有子文件,存到一个List<String>里面
         //找一个目录的子目录
         List<String> result = new ArrayList<String>();
-        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir()), IndexNode.class);
+        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()), IndexNode.class);
         DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getOffset()), DirBlock.class);
         if(nowDir.getSonDirId() == BLOCKNUM - 1){
             return result; //没有

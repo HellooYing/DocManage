@@ -1,6 +1,9 @@
 package com.NeuDocManage.service;
 
+import com.NeuDocManage.model.HostHolder;
+import com.NeuDocManage.model.IndexNode;
 import com.NeuDocManage.model.SuperBlock;
+import com.NeuDocManage.model.User;
 import com.alibaba.fastjson.JSON;
 
 import java.io.File;
@@ -8,10 +11,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Date;
 
 import static com.NeuDocManage.config.MainConfig.*;
-import static com.NeuDocManage.service.BlockService.readBlock;
-import static com.NeuDocManage.service.BlockService.writeBlock;
+import static com.NeuDocManage.service.BlockService.*;
 
 public class DiskService {
     public static MappedByteBuffer disk;//磁盘
@@ -51,11 +54,29 @@ public class DiskService {
 
             //初始化超级块，赋默认初值
             superBlock =new SuperBlock(INODEBLOCKSTART,USERBLOCKNUM,DATABLOCKSTART,INODEBLOCKSTART+1);
+            writeBlock(SUPERBLOCKSTART,JSON.toJSONString(superBlock));
         }
         else{//不是第一次，就把上次的信息存到superblock类中
             superBlock =JSON.parseObject(lastSuperBlockMessage, SuperBlock.class);
         }
+        //初始化root用户及默认的/root目录
+        User root=new User("root","root",7,INODEBLOCKSTART);
+        writeBlock(USERBLOCKSTART,JSON.toJSONString(root));
+        HostHolder.setUser(root);
+        IndexNode rootNode=new IndexNode(INODEBLOCKSTART,1,false,0,"root","root",new Date(),new Date(),0);
+        writeBlock(INODEBLOCKSTART,JSON.toJSONString(rootNode));
+        HostHolder.setCurDir(rootNode);
     }
+
+    public static void releaseDisk(){
+        int emptyFileBlock=DataService.saveStack();
+        if(emptyFileBlock!=0) superBlock.setEmptyFileBlock(emptyFileBlock);
+        int emptyIndexBlock=INodeServie.saveStack();
+        if(emptyIndexBlock!=0) superBlock.setEmptyIndexBlock(emptyIndexBlock);
+        overwriteBlock(SUPERBLOCKSTART,JSON.toJSONString(superBlock));
+    }
+
+
 
     /**
      * 格式化磁盘

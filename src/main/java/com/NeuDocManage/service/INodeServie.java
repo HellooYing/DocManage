@@ -31,13 +31,17 @@ public class INodeServie {
      * @param blockId
      */
     public static void recoverIndexBlock(int blockId){
+        if(blockId>=INODEBLOCKSTART+INODEBLOCKNUM-1){
+            System.out.println("盘块id所在区错误！");
+            return;
+        }
         if(blockStack==null){//如果blockStack未初始化，则说明是重启后第一次调用本函数，要从超级块中获取索引块栈的信息。
             initIndexBlockStack();
         }
         formatBlock(blockId);
-        if(blockStack.size()>= INODEBLOCKSTACKSIZE){
-            removeBlockFromStack(blockId);
-        }
+//        if(blockStack.size()>= INODEBLOCKSTACKSIZE){
+//            removeBlockFromStack(blockId);
+//        }
         blockStack.push(blockId);
     }
 
@@ -61,13 +65,19 @@ public class INodeServie {
         return 0;//正常返回
     }
 
-    private static void removeBlockFromStack(int blockId){
+    public static int saveStack(){
+        if(blockStack==null) return 0;
+        int blockId=blockStack.pop();
         StringBuilder indexBlockIds=new StringBuilder();
-        for (int i = 0; i < INODEBLOCKSTACKSIZE -1 ; i++) {
+        while(blockStack.size()>1) {
             indexBlockIds.append(blockStack.pop()+",");
         }
-        indexBlockIds.append(blockStack.pop());
-        writeBlock(blockId,indexBlockIds.toString());
+        if(blockStack.size()>0) indexBlockIds.append(blockStack.pop());
+        if(writeBlock(blockId,indexBlockIds.toString())==0) return blockId;
+        else{
+            System.out.println("索引块需要覆盖写入！");
+            return blockId;
+        }
     }
 
     private static void initIndexBlockStack(){

@@ -1,5 +1,6 @@
 package com.NeuDocManage.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,11 +10,11 @@ public class IndexNode extends Block{
 
     //文件说明信息
     private int type; //文件类型 1:目录 2:文件 3:硬链接 4:软链接
-    private List<Permissions> mode; //权限
+    private List<Permissions> mode=new ArrayList<>(); //权限
     private boolean used; //是否空闲
     private int size; //对应文件大小
 
-    private String name; //文件名称/目录名称
+    private String fileName; //文件名称/目录名称
     private String creator; //创建者
 
     private Date createTime; //创建日期
@@ -25,6 +26,19 @@ public class IndexNode extends Block{
 
     public IndexNode() {
         super("IndexNode");
+    }
+
+    public IndexNode(int id, int type, boolean used, int size, String creator,String fileName, Date createTime, Date changeTime, int offset) {
+        super("IndexNode");
+        this.id = id;
+        this.type = type;
+        this.used = used;
+        this.size = size;
+        this.creator = creator;
+        this.fileName=fileName;
+        this.createTime = createTime;
+        this.changeTime = changeTime;
+        this.offset = offset;
     }
 
     public int getId() {
@@ -67,12 +81,12 @@ public class IndexNode extends Block{
         this.size = size;
     }
 
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getCreator() {

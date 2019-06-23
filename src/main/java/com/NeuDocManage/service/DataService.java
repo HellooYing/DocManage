@@ -82,6 +82,25 @@ public class DataService {
     }
 
     /**
+     * 关闭磁盘时保留栈信息到超级块中
+     * @return blockId
+     */
+    public static int saveStack(){
+        if(blockStack==null||blockStack.size()==0) return 0;
+        int blockId=blockStack.pop();
+        StringBuilder dataBlockIds=new StringBuilder();
+        while(blockStack.size()>1) {
+            dataBlockIds.append(blockStack.pop()+",");
+        }
+        if(blockStack.size()>0) dataBlockIds.append(blockStack.pop());
+        if(writeBlock(blockId,dataBlockIds.toString())==0) return blockId;
+        else{
+            System.out.println("数据块需要覆盖写入！");
+            return blockId;
+        }
+    }
+
+    /**
      * 内部函数
      * 从超级块中获取盘块栈的信息
      */

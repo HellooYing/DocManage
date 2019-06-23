@@ -7,6 +7,16 @@ public class User {
     private int mod; //权限
     private int inode; //用户根目录i节点
 
+    public User() {
+    }
+
+    public User(String userName, String pwd, int mod, int inode) {
+        this.userName = userName;
+        this.pwd = pwd;
+        this.mod = mod;
+        this.inode = inode;
+    }
+
     public String getUserName() {
         return userName;
     }
