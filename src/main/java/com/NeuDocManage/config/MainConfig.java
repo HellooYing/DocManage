@@ -20,4 +20,7 @@ public class MainConfig {
     public final static int DATABLOCKNUM=BLOCKNUM-SUPERBLOCKNUM-INODEBLOCKNUM-USERBLOCKNUM;//剩下的都是数据块
     public final static int DATABLOCKSTART =USERBLOCKNUM+USERBLOCKSTART;//数据区的第一个盘块的id
 
+    public final static int DATABLOCKSTACKSIZE =100;//成组链接法时数据块栈的容量
+    public final static int INODEBLOCKSTACKSIZE =64;//成组链接法时索引块栈的容量
+
 }

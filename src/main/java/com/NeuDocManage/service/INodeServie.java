@@ -35,7 +35,7 @@ public class INodeServie {
             initIndexBlockStack();
         }
         formatBlock(blockId);
-        if(blockStack.size()>=100){
+        if(blockStack.size()>= INODEBLOCKSTACKSIZE){
             removeBlockFromStack(blockId);
         }
         blockStack.push(blockId);
@@ -56,13 +56,14 @@ public class INodeServie {
         for (int i = indexBlockIds.length-1; i >=0 ; i--) {
             blockStack.push(Integer.parseInt(indexBlockIds[i]));
         }
+        formatBlock(indexBlockId);
         blockStack.push(indexBlockId);
         return 0;//正常返回
     }
 
     private static void removeBlockFromStack(int blockId){
         StringBuilder indexBlockIds=new StringBuilder();
-        for (int i = 0; i <99 ; i++) {
+        for (int i = 0; i < INODEBLOCKSTACKSIZE -1 ; i++) {
             indexBlockIds.append(blockStack.pop()+",");
         }
         indexBlockIds.append(blockStack.pop());

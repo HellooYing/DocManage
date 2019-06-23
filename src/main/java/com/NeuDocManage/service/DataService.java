@@ -3,6 +3,7 @@ package com.NeuDocManage.service;
 import java.util.Stack;
 
 import static com.NeuDocManage.config.MainConfig.BLOCKNUM;
+import static com.NeuDocManage.config.MainConfig.DATABLOCKSTACKSIZE;
 import static com.NeuDocManage.service.DiskService.superBlock;
 import static com.NeuDocManage.service.BlockService.*;
 
@@ -36,7 +37,7 @@ public class DataService {
             initDataBlockStack();
         }
         formatBlock(blockId);
-        if(blockStack.size()>=100){
+        if(blockStack.size()>= DATABLOCKSTACKSIZE){
             removeBlockFromStack(blockId);
         }
         blockStack.push(blockId);
@@ -62,6 +63,7 @@ public class DataService {
         for (int i = dataBlockIds.length-1; i >=0 ; i--) {
             blockStack.push(Integer.parseInt(dataBlockIds[i]));
         }
+        formatBlock(dataBlockId);
         blockStack.push(dataBlockId);
         return 0;//正常返回
     }
@@ -72,7 +74,7 @@ public class DataService {
      */
     private static void removeBlockFromStack(int blockId){
         StringBuilder dataBlockIds=new StringBuilder();
-        for (int i = 0; i <99 ; i++) {
+        for (int i = 0; i < DATABLOCKSTACKSIZE -1 ; i++) {
             dataBlockIds.append(blockStack.pop()+",");
         }
         dataBlockIds.append(blockStack.pop());
