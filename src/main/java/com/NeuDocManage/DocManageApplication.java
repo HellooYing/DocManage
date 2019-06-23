@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Scanner;
 
+import static com.NeuDocManage.model.HostHolder.getCurDir;
 import static com.NeuDocManage.service.DiskService.*;
 
 public class DocManageApplication {
@@ -29,7 +30,7 @@ public class DocManageApplication {
         }
         System.out.println("您好，用户root。现在时间是"+new Date()+",输入help可获取指令列表。");
         while (true){
-            System.out.print("root@docManage:/root#");
+            System.out.print("root@docManage:"+getCurDir().getFileName()+"#");
             input=scanner.nextLine().toLowerCase();
             if(input.equals("help")){
                 System.out.println("指令列表：");

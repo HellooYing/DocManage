@@ -15,6 +15,7 @@ import java.util.Date;
 
 import static com.NeuDocManage.config.MainConfig.*;
 import static com.NeuDocManage.service.BlockService.*;
+import static com.NeuDocManage.service.DataService.getDataBlock;
 
 public class DiskService {
     public static MappedByteBuffer disk;//磁盘
@@ -55,17 +56,23 @@ public class DiskService {
             //初始化超级块，赋默认初值
             superBlock =new SuperBlock(INODEBLOCKSTART,USERBLOCKNUM,DATABLOCKSTART,INODEBLOCKSTART+1);
             writeBlock(SUPERBLOCKSTART,JSON.toJSONString(superBlock));
+
+            //初始化root用户及默认的/root目录
+            User root=new User("root","root",7,INODEBLOCKSTART);
+            writeBlock(USERBLOCKSTART,JSON.toJSONString(root));
+            HostHolder.setUser(root);
+            IndexNode rootNode=new IndexNode(INODEBLOCKSTART,1,false,0,"root","root",new Date(),new Date(),0,getDataBlock());
+            writeBlock(INODEBLOCKSTART,JSON.toJSONString(rootNode));
+            HostHolder.setCurDir(rootNode);
         }
-        else{//不是第一次，就把上次的信息存到superblock类中
+        else{//不是第一次，就把上次的信息从磁盘读到superblock类中，把用户和根目录也从磁盘中读出
             superBlock =JSON.parseObject(lastSuperBlockMessage, SuperBlock.class);
+            User root=JSON.parseObject(readBlock(USERBLOCKSTART).trim(),User.class);
+            HostHolder.setUser(root);
+            IndexNode rootNode=JSON.parseObject(readBlock(INODEBLOCKSTART).trim(),IndexNode.class);
+            HostHolder.setCurDir(rootNode);
         }
-        //初始化root用户及默认的/root目录
-        User root=new User("root","root",7,INODEBLOCKSTART);
-        writeBlock(USERBLOCKSTART,JSON.toJSONString(root));
-        HostHolder.setUser(root);
-        IndexNode rootNode=new IndexNode(INODEBLOCKSTART,1,false,0,"root","root",new Date(),new Date(),0);
-        writeBlock(INODEBLOCKSTART,JSON.toJSONString(rootNode));
-        HostHolder.setCurDir(rootNode);
+
     }
 
     public static void releaseDisk(){

@@ -66,7 +66,7 @@ public class INodeServie {
     }
 
     public static int saveStack(){
-        if(blockStack==null) return 0;
+        if(blockStack==null||blockStack.size()==0) return 0;
         int blockId=blockStack.pop();
         StringBuilder indexBlockIds=new StringBuilder();
         while(blockStack.size()>1) {

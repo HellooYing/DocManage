@@ -22,13 +22,13 @@ public class IndexNode extends Block{
 
     //索引地址
     private int offset; //存放磁盘块的直接地址（磁盘偏移量）
-    private int indirectData; //存放一个间接索引地址（指向i节点)
+    private int indirectData; //指向数据块
 
     public IndexNode() {
         super("IndexNode");
     }
 
-    public IndexNode(int id, int type, boolean used, int size, String creator,String fileName, Date createTime, Date changeTime, int offset) {
+    public IndexNode(int id, int type, boolean used, int size, String creator,String fileName, Date createTime, Date changeTime, int offset,int indirectData) {
         super("IndexNode");
         this.id = id;
         this.type = type;
@@ -39,6 +39,7 @@ public class IndexNode extends Block{
         this.createTime = createTime;
         this.changeTime = changeTime;
         this.offset = offset;
+        this.indirectData=indirectData;
     }
 
     public int getId() {
