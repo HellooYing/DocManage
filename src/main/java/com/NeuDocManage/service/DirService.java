@@ -33,7 +33,17 @@ public class DirService {
 //        return CurDir;
 //    }
 
-    private static int findSubDir(int dirId,String dirName){
+    public static void showInfo(int inodeId) {
+        IndexNode inode = JSON.parseObject(readBlock(inodeId).trim(), IndexNode.class);
+        System.out.println( "Name: "+inode.getFileName()+"\t"+
+                            "Type: "+inode.getType()+"\t"+
+                            "Size: "+inode.getSize()+"\t"+
+                            "Creator: "+inode.getCreator()+"\t"+
+                            "CreateTime: "+inode.getChangeTime()+"\t"+
+                            "ChangeTime: "+inode.getChangeTime());
+    }
+
+    private static int findSubDir(int dirId, String dirName){
         //找一个目录的子目录
         //System.out.println(dirName);
         IndexNode nowInode = JSON.parseObject(readBlock(dirId).trim(), IndexNode.class);
@@ -62,7 +72,7 @@ public class DirService {
 
         int inodeNum = getIndexBlock(); //申请一个空闲i节点
         int dirBlockNum = getDataBlock(); //申请一个空闲数据块
-        System.out.println("hhh "+inodeNum+" "+dirBlockNum);
+        //System.out.println("hhh "+inodeNum+" "+dirBlockNum);
         if(inodeNum == INODEBLOCKSTART+INODEBLOCKNUM-1 && dirBlockNum ==BLOCKNUM - 1 ){
             return -1;
         }
@@ -123,7 +133,7 @@ public class DirService {
 
     private static Pair<Integer,String> cdAutomation(Pair<Integer,String> dirName){
         //目录自动机
-        //System.out.println(dirName.getValue());
+        System.out.println(dirName.getKey()+" "+dirName.getValue());
         if(dirName.getKey() == -1){
             return dirName; //出错了
         }else if(dirName.getValue().equals( "\\/")){
@@ -219,7 +229,7 @@ public class DirService {
 
         //写入i节点信息
         IndexNode inode = new IndexNode();
-        inode.setId(dataBlockNum);
+        inode.setId(inodeNum);
         inode.setType(2);
 
         //mode是空的，表示只有root和自己能有全部权限
@@ -268,9 +278,11 @@ public class DirService {
         for(Integer x : nowDir.getSonDataId()){
             nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
             if(nowInode.getFileName().equals(fileName)){
-                headId = nowInode.getIndirectData();
+                headId = nowInode.getId();
+                System.out.println("headId: "+headId);
+                fileId = nowInode.getIndirectData();
                  //找到这个文件结尾的Id
-                 DataBlock nowData = JSON.parseObject(readBlock(headId).trim(), DataBlock.class);
+                 DataBlock nowData = JSON.parseObject(readBlock(fileId).trim(), DataBlock.class);
                  int nextId = nowData.getNextDataId();
                  while(nextId !=BLOCKNUM - 1){
                      nowInode = JSON.parseObject(readBlock(nextId).trim(), IndexNode.class);
@@ -291,15 +303,15 @@ public class DirService {
         }
         //设置content
         List<String> contents = new ArrayList<String>();
-        int limit = 450;
+        int limit = 420;
         //首先判断String 长度，如果大于450，就分隔
         int beginIndex =  0;
-        int endIndex = limit - 1;
+        int endIndex = limit;
         int length = content.length();
         while(length > limit){
             contents.add(content.substring(beginIndex,endIndex));
             length -= limit;
-            beginIndex = endIndex+1;
+            beginIndex = endIndex;
             endIndex = endIndex + limit;
         }
         contents.add(content.substring(beginIndex));
@@ -314,13 +326,21 @@ public class DirService {
             nowData.setNextDataId(newInode);
         }
         nowData.setData(contents.get(0)); //替换数据
-        overwriteBlock(fileId,JSON.toJSONString(nowData));
+        System.out.println("Write in:"+fileId+"\n"+JSON.toJSONString(nowData));
+        System.out.println(overwriteBlock(fileId,JSON.toJSONString(nowData)));
+        System.out.println("length: "+JSON.toJSONString(nowData).length());
+
+        System.out.println("headid:"+headId);
+        nowInode = JSON.parseObject(readBlock(headId).trim(), IndexNode.class);
+        nowData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
+        System.out.println(JSON.toJSONString(nowInode)+"\nwithout change\n"+JSON.toJSONString(nowData));
 
         for (int i = 1; i < contents.size(); i++) {
+            System.out.println("newData:"+newData+"\nnewInode:"+newInode);
             String nowContent = contents.get(i);
             //首先写入其他信息
             //写入i节点信息
-            inode.setId(newData);
+            inode.setId(newInode);
             inode.setType(2);
 
             //mode是空的，表示只有root和自己能有全部权限
@@ -345,14 +365,21 @@ public class DirService {
 
             writeBlock(newInode,JSON.toJSONString(inode));
             writeBlock(newData,JSON.toJSONString(dataBlock));
-            if(i+1 !=  contents.size() - 1) {
+            System.out.println("i+1:"+(int)(i+1)+(contents.size() - 1));
+            if(i !=  contents.size() - 1) {
                 //如果这个结点的下个结点不是最后一个结点
-                newData = getDataBlock();
                 newInode = getIndexBlock();
                 dataBlock.setNextDataId(newInode);
+                overwriteBlock(newData,JSON.toJSONString(dataBlock));
+                newData = getDataBlock();
                 inode = new IndexNode();
             }
         }
+        nowInode = JSON.parseObject(readBlock(headId).trim(), IndexNode.class);
+        nowData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
+        nowInode.setSize(512*(contents.size()-1)+contents.get(contents.size()-1).length()+48); //设置好内存大小
+        System.out.println(JSON.toJSONString(nowInode)+"\nwith change\n"+JSON.toJSONString(nowData));
+        overwriteBlock(headId,JSON.toJSONString(nowInode));
         return true;
     }
 
@@ -364,8 +391,10 @@ public class DirService {
         for(Integer x : nowDir.getSonDataId()){
             nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
             if(nowInode.getFileName().equals(fileName)){
+                System.out.println("Inode: "+nowInode.getIndirectData());
                 DataBlock resData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
                 StringBuilder res = new StringBuilder();
+                System.out.println("resData: "+JSON.toJSONString(resData));
                 res.append(resData.getData());
                 while(resData.getNextDataId() != BLOCKNUM - 1){
                     nowInode = JSON.parseObject(readBlock(resData.getNextDataId()).trim(), IndexNode.class);

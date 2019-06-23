@@ -43,8 +43,8 @@ public class DirServiceTest {
         IndexNode inode2= JSON.parseObject(readBlock(id2).trim(),IndexNode.class);
         HostHolder.setCurDir(inode2); //设置当前目录是fuck
         int id3 = mkdir("shit");
-        HostHolder.setCurDir(inode); //设置当前目录是name
-        assertEquals(id3,changeDir("./fuck/shit"));
+        //HostHolder.setCurDir(inode); //设置当前目录是name
+        assertEquals(id2,changeDir("./../fuck"));
         releaseDisk();
     }
     /**
@@ -80,9 +80,15 @@ public class DirServiceTest {
         int id = createFile("hhh");
         System.out.println(id);
         readFile("hhh");
-        writeFile("hhh","123456");
-        writeFile("hhh","12");
-        assertEquals("123456 12",readFile("hhh"));
+        StringBuilder res = new StringBuilder();
+        for(int i = 0; i < 1000; ++i){
+            res.append("s");
+        }
+        String content = res.toString();
+        writeFile("hhh",content);
+        //writeFile("hhh","12");
+        showInfo(id);
+        assertEquals(content,readFile("hhh"));
         releaseDisk();
     }
 }
