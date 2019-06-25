@@ -40,6 +40,7 @@ public class BlockService {
 
     public static int overwriteBlock(int blockId,String content){
         if(content.length()>BLOCKSIZE) return 2;// content比块大，不能写入
+        formatBlock(blockId);
         int position=blockId*BLOCKSIZE;
         disk.position(position);
         for (int i = 0; i <content.length(); i++) {

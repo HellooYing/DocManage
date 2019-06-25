@@ -1,5 +1,6 @@
 package com.NeuDocManage.service;
 
+import com.NeuDocManage.model.DataBlock;
 import com.NeuDocManage.model.DirBlock;
 import com.NeuDocManage.model.HostHolder;
 import com.NeuDocManage.model.IndexNode;
@@ -32,7 +33,17 @@ public class DirService {
 //        return CurDir;
 //    }
 
-    private static int findSubDir(int dirId,String dirName){
+    public static void showInfo(int inodeId) {
+        IndexNode inode = JSON.parseObject(readBlock(inodeId).trim(), IndexNode.class);
+        System.out.println( "Name: "+inode.getFileName()+"\t"+
+                "Type: "+inode.getType()+"\t"+
+                "Size: "+inode.getSize()+"\t"+
+                "Creator: "+inode.getCreator()+"\t"+
+                "CreateTime: "+inode.getChangeTime()+"\t"+
+                "ChangeTime: "+inode.getChangeTime());
+    }
+
+    private static int findSubDir(int dirId, String dirName){
         //找一个目录的子目录
         //System.out.println(dirName);
         IndexNode nowInode = JSON.parseObject(readBlock(dirId).trim(), IndexNode.class);
@@ -61,7 +72,7 @@ public class DirService {
 
         int inodeNum = getIndexBlock(); //申请一个空闲i节点
         int dirBlockNum = getDataBlock(); //申请一个空闲数据块
-        System.out.println("hhh "+inodeNum+" "+dirBlockNum);
+        //System.out.println("hhh "+inodeNum+" "+dirBlockNum);
         if(inodeNum == INODEBLOCKSTART+INODEBLOCKNUM-1 && dirBlockNum ==BLOCKNUM - 1 ){
             return -1;
         }
@@ -115,14 +126,14 @@ public class DirService {
         writeBlock(inodeNum, JSON.toJSONString(inode));
         //System.out.println(inodeNum+" "+readBlock(inodeNum));
         writeBlock(dirBlockNum, JSON.toJSONString(dirBlock));
-       // System.out.println(dirBlockNum+" "+readBlock(dirBlockNum));
+        // System.out.println(dirBlockNum+" "+readBlock(dirBlockNum));
 
         return inodeNum;
     }
 
     private static Pair<Integer,String> cdAutomation(Pair<Integer,String> dirName){
         //目录自动机
-        //System.out.println(dirName.getValue());
+        System.out.println(dirName.getKey()+" "+dirName.getValue());
         if(dirName.getKey() == -1){
             return dirName; //出错了
         }else if(dirName.getValue().equals( "\\/")){
@@ -140,7 +151,9 @@ public class DirService {
              */
             int find = findSubDir(dirName.getKey(),subDir[0]);
             if(find != -1){
+                //System.out.println("fuckyou");
                 if(subDir.length == 1){
+
                     //就剩一个目录了，直接返回
                     return new Pair<Integer, String>(find,subDir[0]);
                 }
@@ -207,4 +220,7 @@ public class DirService {
         }
         return result;
     }
+
+
+
 }
