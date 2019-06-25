@@ -32,17 +32,50 @@ public class DocManageApplication {
         while (true){
             System.out.print("root@docManage:"+getCurDir().getFileName()+"#");
             input=scanner.nextLine().toLowerCase();
-            if(input.equals("help")){
-                System.out.println("指令列表：");
-                System.out.println("ls [<目录>] : 显示当前目录或给定目录下的文件列表");
-                System.out.println("cd <目录> : 进入给定目录");
-                System.out.println("create <文件名> [<目录>]: 在当前目录或给定目录下创建文件");
-                System.out.println("mkdir <目录名> [<目录>] : 在当前目录或给定目录下创建目录");
-                System.out.println("read <文件名> : 读取文件");
-                System.out.println("rm [-r] <文件名或目录名> : 删除文件或目录，-r代表递归删除目录下所有子目录和文件");
-                System.out.println("write <文件名> <写入内容> : 向文件中写入内容");
-                System.out.println("su <用户名> : 登录其他用户");
-                System.out.println("exit : 退出文件系统");
+            String order=input.trim().split(" ")[0];
+            switch (order){
+                case "help":
+                    System.out.println("指令列表：");
+                    System.out.println("ls [<目录>] : 显示当前目录或给定目录下的文件列表");
+                    System.out.println("ll [<目录>] : 显示当前目录或给定目录下的文件详细信息");
+                    System.out.println("cd <目录> : 进入给定目录");
+                    System.out.println("create <文件名> [<目录>]: 在当前目录或给定目录下创建文件");
+                    System.out.println("mkdir <目录名> [<目录>] : 在当前目录或给定目录下创建目录");
+                    System.out.println("read <文件名> : 读取文件");
+                    System.out.println("rm [-r] <文件名或目录名> : 删除文件或目录，-r代表递归删除目录下所有子目录和文件");
+                    System.out.println("write <文件名> <写入内容> : 向文件中写入内容");
+                    System.out.println("su <用户名> : 登录其他用户");
+                    System.out.println("useradd <用户名> : 注册其他用户");
+                    System.out.println("userdel <用户名> : 删除其他用户");
+                    System.out.println("exit : 退出文件系统");
+                    break;
+                case "exit":
+                    System.out.println("再见！");
+                    break;
+                case "ls":
+                    break;
+                case "ll":
+                    break;
+                case "cd":
+                    break;
+                case "create":
+                    break;
+                case "mkdir":
+                    break;
+                case "read":
+                    break;
+                case "rm":
+                    break;
+                case "write":
+                    break;
+                case "su":
+                    break;
+                case "useradd":
+                    break;
+                case "userdel":
+                    break;
+                default:
+                    System.out.println("指令无效，请重试！");
             }
         }
     }
