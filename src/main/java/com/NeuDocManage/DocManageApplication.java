@@ -45,6 +45,7 @@ public class DocManageApplication {
                     System.out.println("rm [-r] <文件名或目录名> : 删除文件或目录，-r代表递归删除目录下所有子目录和文件");
                     System.out.println("write <文件名> <写入内容> : 向文件中写入内容");
                     System.out.println("su <用户名> : 登录其他用户");
+                    System.out.println("chmod <-x|-r|-w|rwx|> <文件名>  : 修改文件默认权限");
                     System.out.println("useradd <用户名> : 注册其他用户");
                     System.out.println("userdel <用户名> : 删除其他用户");
                     System.out.println("exit : 退出文件系统");
@@ -69,6 +70,8 @@ public class DocManageApplication {
                 case "write":
                     break;
                 case "su":
+                    break;
+                case "chmod":
                     break;
                 case "useradd":
                     break;

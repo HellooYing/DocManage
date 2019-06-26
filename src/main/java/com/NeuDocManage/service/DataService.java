@@ -15,7 +15,7 @@ public class DataService {
      * @return new dataBlock id
      */
     public static int getDataBlock(){
-        if(blockStack==null){//如果blockStack未初始化，则说明是重启后第一次调用本函数，要从超级块中获取盘块栈的信息。
+        if(blockStack==null||blockStack.size()==0){//如果blockStack未初始化，则说明是重启后第一次调用本函数，要从超级块中获取盘块栈的信息。
             initDataBlockStack();
         }
         while(blockStack.size()==1){//如果栈里只有一个blockId了的话
@@ -33,16 +33,14 @@ public class DataService {
      * @param blockId
      */
     public static void recoverDataBlock(int blockId){
-        if(blockStack==null){//如果blockStack未初始化，则说明是重启后第一次调用本函数，要从超级块中获取盘块栈的信息。
+        if(blockStack==null||blockStack.size()==0){//如果blockStack未初始化，则说明是重启后第一次调用本函数，要从超级块中获取盘块栈的信息。
             initDataBlockStack();
         }
         formatBlock(blockId);
         if(blockStack.size()>= DATABLOCKSTACKSIZE){
             removeBlockFromStack(blockId);
         }
-        System.out.println("dataBlockStack前"+blockStack);
         blockStack.push(blockId);
-        System.out.println("dataBlockStack后"+blockStack);
     }
 
     /**
@@ -106,7 +104,7 @@ public class DataService {
      * 内部函数
      * 从超级块中获取盘块栈的信息
      */
-    private static void initDataBlockStack(){
+    public static void initDataBlockStack(){
         blockStack=new Stack<Integer>();
         int firstDataBlock= superBlock.getEmptyFileBlock();
         blockStack.push(firstDataBlock);//将第一个块的数据push进去

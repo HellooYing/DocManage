@@ -69,6 +69,7 @@ public class FileServiceTest {
         System.out.println(getFullName(findFileByFullName("/root/hhh")));
         System.out.println(getINodeById(2,root));
         deleteAllFile("name2");
+        deleteAllFile("name3");
         deleteOneFile("hhh");
         printTree();
         releaseDisk();

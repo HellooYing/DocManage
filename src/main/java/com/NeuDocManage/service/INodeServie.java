@@ -13,7 +13,7 @@ public class INodeServie {
      * @return new indexBlock id
      */
     public static int getIndexBlock(){
-        if(blockStack==null){//如果blockStack未初始化，则说明是重启后第一次调用本函数，要从超级块中获取索引块栈的信息。
+        if(blockStack==null||blockStack.size()==0){//如果blockStack未初始化，则说明是重启后第一次调用本函数，要从超级块中获取索引块栈的信息。
             initIndexBlockStack();
         }
         while(blockStack.size()==1){//如果栈里只有一个blockId了的话
@@ -35,13 +35,11 @@ public class INodeServie {
             System.out.println("盘块id所在区错误！");
             return;
         }
-        if(blockStack==null){//如果blockStack未初始化，则说明是重启后第一次调用本函数，要从超级块中获取索引块栈的信息。
+        if(blockStack==null||blockStack.size()==0){//如果blockStack未初始化，则说明是重启后第一次调用本函数，要从超级块中获取索引块栈的信息。
             initIndexBlockStack();
         }
         formatBlock(blockId);
-        System.out.println("indexBlockStack前"+blockStack);
         blockStack.push(blockId);
-        System.out.println("indexBlockStack后"+blockStack);
     }
 
     private static int addBlockToStack(){
@@ -79,7 +77,7 @@ public class INodeServie {
         }
     }
 
-    private static void initIndexBlockStack(){
+    public static void initIndexBlockStack(){
         blockStack=new Stack<Integer>();
         int firstIndexBlock= superBlock.getEmptyIndexBlock();
         blockStack.push(firstIndexBlock);//将第一个索引块的数据push进去

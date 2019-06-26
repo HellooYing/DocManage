@@ -13,6 +13,8 @@ import java.util.Date;
 import static com.NeuDocManage.config.MainConfig.*;
 import static com.NeuDocManage.service.BlockService.*;
 import static com.NeuDocManage.service.DataService.getDataBlock;
+import static com.NeuDocManage.service.DataService.initDataBlockStack;
+import static com.NeuDocManage.service.INodeServie.initIndexBlockStack;
 
 public class DiskService {
     public static MappedByteBuffer disk;//磁盘
