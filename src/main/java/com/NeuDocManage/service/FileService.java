@@ -13,7 +13,9 @@ import static com.NeuDocManage.model.HostHolder.getCurDir;
 import static com.NeuDocManage.service.BlockService.*;
 import static com.NeuDocManage.service.BlockService.readBlock;
 import static com.NeuDocManage.service.DataService.getDataBlock;
+import static com.NeuDocManage.service.DataService.recoverDataBlock;
 import static com.NeuDocManage.service.INodeServie.getIndexBlock;
+import static com.NeuDocManage.service.INodeServie.recoverIndexBlock;
 
 public class FileService {
     public static INode root;
@@ -153,6 +155,7 @@ public class FileService {
      * @return 内存i节点
      */
     public static INode getINodeById(int id,INode node){
+        if(node.getId()==id) return node;
         List<INode> file=node.getFileSon();
         List<INode> dir=node.getDirSon();
         for(INode iNode:file){
@@ -181,7 +184,7 @@ public class FileService {
     /**
      * 在当前目录删除一个文件或空目录
      * @param fileName
-     * @return 是否成功
+     * @return false代表没有找到该文件名对应文件，true代表已删除
      */
     public static boolean deleteOneFile(String fileName){
         INode cur=getCurDir();
@@ -189,27 +192,46 @@ public class FileService {
         List<INode> dir=cur.getDirSon();
         for(INode iNode:file){
             if(iNode.getFileName().equals(fileName)){
-                if(deleteFileByINode(iNode)) return true;
-                else return false;
+                deleteFileByINode(iNode);
+                return true;
             }
         }
         for(INode iNode:dir){
             if(iNode.getFileName().equals(fileName)){
-                if(deleteFileByINode(iNode)) return true;
-                else return false;
+                deleteFileByINode(iNode);
+                return true;
             }
         }
         return false;
     }
 
-    public static boolean deleteFileByINode(INode node){
-//        List<Integer> deleteList=new ArrayList<>();
-//        deleteList.add(node.getId());
-//        int id=node.getIndirectData();
-//        while(id!=null){
+    /**
+     * 递归的删除文件
+     * @param node
+     */
+//    public static boolean deleteAllFileByINode(INode node){
 //
-//        }
-        return false;
+//    }
+
+    /**
+     * 根据内存i节点，格式化索引区及内存区相关的块，并回收这些块以供下次分配
+     * 只针对文件及空目录，没有进行递归操作
+     * @param node
+     */
+    public static void deleteFileByINode(INode node){
+        recoverIndexBlock(node.getId());//回收索引块
+        List<Integer> deleteList=new ArrayList<>();
+        int id=node.getIndirectData();
+        while(id!=BLOCKNUM-1){
+            deleteList.add(id);
+            String blockContent=readBlock(id).trim();
+            String type=JSON.parseObject(blockContent,Block.class).getName();
+            if(type.equals("DataBlock")) id=JSON.parseObject(blockContent,DataBlock.class).getNextDataId();
+            else if(type.equals("DirBlock")) id=JSON.parseObject(blockContent,DirBlock.class).getNextDirId();
+        }
+        for(int i:deleteList){
+            recoverDataBlock(i);//回收数据块
+        }
     }
 
     //文件有关操作
