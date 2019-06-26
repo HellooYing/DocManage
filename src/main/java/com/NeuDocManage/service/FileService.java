@@ -89,9 +89,23 @@ public class FileService {
         return r;
     }
 
-//    public static INode findFileOnCur(String fullName){
-//
-//    }
+    /**
+     * 在当前目录查找文件，返回内存i节点
+     * @param fileName
+     * @return
+     */
+    public static INode findFileOnCur(String fileName){
+        INode cur = getCurDir();
+        List<INode> file=cur.getFileSon();
+        List<INode> dir=cur.getDirSon();
+        for(INode iNode:file){
+            if(iNode.getFileName().equals(fileName)) return iNode;
+        }
+        for(INode iNode:dir){
+            if(iNode.getFileName().equals(fileName)) return iNode;
+        }
+        return null;
+    }
 
     /**
      * 根据文件全名（/root/hhh）查找内存中的索引节点
@@ -186,34 +200,60 @@ public class FileService {
     }
 
     /**
+     * node为即将被删除的文件的索引，要修改其父目录的size和sonDataId/sonDirId
+     * @param node
+     */
+    private static void updateFatherForDelete(INode node){
+        int size=node.getSize();
+        int id=node.getId();
+
+        //修改父目录数据区的sonDataId/sonDirId
+        DirBlock father=JSON.parseObject(readBlock(node.getFather().getIndirectData()).trim(),DirBlock.class);
+        father.removeSon(id);
+        overwriteBlock(node.getFather().getIndirectData(),JSON.toJSONString(father));
+
+        //修改父目录索引区的size
+        IndexNode father1=JSON.parseObject(readBlock(node.getFather().getId()).trim(),IndexNode.class);
+        father1.setSize(father1.getSize()-size);
+        overwriteBlock(node.getFather().getId(),JSON.toJSONString(father1));
+    }
+
+    /**
      * 在当前目录删除一个文件或空目录
      * @param fileName
      * @return false代表没有找到该文件名对应文件，true代表已删除
      */
     public static boolean deleteOneFile(String fileName){
-        INode cur=getCurDir();
-        List<INode> file=cur.getFileSon();
-        List<INode> dir=cur.getDirSon();
-        for(INode iNode:file){
-            if(iNode.getFileName().equals(fileName)){
-                deleteFileByINode(iNode);
-                getTree();
-                return true;
-            }
+        INode node;
+        if(fileName.substring(0,1).equals("/")) node=findFileByFullName(fileName);//如果fileName是文件全名
+        else node=findFileOnCur(fileName);//否则就在当前目录查询
+        if(node==null) return false;
+        if(node.getType()==1&&(node.getFileSon().size()!=0||node.getDirSon().size()!=0)){
+            //如果该文件是目录，且子目录或子文件不为0，则无法删除
+            System.out.println("该目录下有其他文件，需要通过 del -r <filename> 递归删除");
+            return false;
         }
-        for(INode iNode:dir){
-            if(iNode.getFileName().equals(fileName)){
-                deleteFileByINode(iNode);
-                getTree();
-                return true;
-            }
-        }
-        return false;
+        updateFatherForDelete(node);
+        deleteFileByINode(node);
+        getTree();
+        return true;
     }
 
-//    public static boolean deleteAllFile(String fileName){
-//
-//    }
+    /**
+     * 根据文件名递归删除文件
+     * @param fileName
+     * @return
+     */
+    public static boolean deleteAllFile(String fileName){
+        INode node;
+        if(fileName.substring(0,1).equals("/")) node=findFileByFullName(fileName);//如果fileName是全名
+        else node=findFileOnCur(fileName);//否则就在当前目录查询
+        if(node==null) return false;
+        updateFatherForDelete(node);
+        deleteAllFileByINode(node);
+        getTree();
+        return true;
+    }
 
     /**
      * 递归的删除文件
@@ -238,7 +278,7 @@ public class FileService {
 
     /**
      * 根据内存i节点，格式化索引区及内存区相关的块，并回收这些块以供下次分配
-     * 只针对文件及空目录，没有进行递归操作
+     * 不支持递归
      * @param node
      */
     public static void deleteFileByINode(INode node){

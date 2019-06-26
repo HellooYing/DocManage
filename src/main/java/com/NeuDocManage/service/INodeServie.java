@@ -39,10 +39,9 @@ public class INodeServie {
             initIndexBlockStack();
         }
         formatBlock(blockId);
-//        if(blockStack.size()>= INODEBLOCKSTACKSIZE){
-//            removeBlockFromStack(blockId);
-//        }
+        System.out.println("indexBlockStack前"+blockStack);
         blockStack.push(blockId);
+        System.out.println("indexBlockStack后"+blockStack);
     }
 
     private static int addBlockToStack(){

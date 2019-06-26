@@ -23,6 +23,21 @@ public class DirBlock extends Block {
         this.faDirId = faDirId;
     }
 
+    public void removeSon(int id){
+        for (int i = 0; i <sonDataId.size() ; i++) {
+            if(sonDataId.get(i)==id){
+                sonDataId.remove(i);
+                return;
+            }
+        }
+        for (int i = 0; i <sonDirId.size() ; i++) {
+            if(sonDirId.get(i)==id) {
+                sonDirId.remove(i);
+                return;
+            }
+        }
+    }
+
     public DirBlock() {
         super("DirBlock");
     }

@@ -22,16 +22,8 @@ public class INode extends IndexNode {
         return dirSon;
     }
 
-    public void setDirSon(List<INode> dirSon) {
-        this.dirSon = dirSon;
-    }
-
     public List<INode> getFileSon() {
         return fileSon;
-    }
-
-    public void setFileSon(List<INode> fileSon) {
-        this.fileSon = fileSon;
     }
 
     public INode getFather() {

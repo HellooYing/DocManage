@@ -40,7 +40,9 @@ public class DataService {
         if(blockStack.size()>= DATABLOCKSTACKSIZE){
             removeBlockFromStack(blockId);
         }
+        System.out.println("dataBlockStack前"+blockStack);
         blockStack.push(blockId);
+        System.out.println("dataBlockStack后"+blockStack);
     }
 
     /**
