@@ -15,6 +15,7 @@ import static com.NeuDocManage.config.MainConfig.*;
 import static com.NeuDocManage.model.HostHolder.getCurDir;
 import static com.NeuDocManage.service.BlockService.*;
 import static com.NeuDocManage.service.DataService.getDataBlock;
+import static com.NeuDocManage.service.FileService.getTree;
 import static com.NeuDocManage.service.INodeServie.getIndexBlock;
 
 public class DirService {
@@ -112,7 +113,7 @@ public class DirService {
         //System.out.println(inodeNum+" "+readBlock(inodeNum));
         writeBlock(dirBlockNum, JSON.toJSONString(dirBlock));
         // System.out.println(dirBlockNum+" "+readBlock(dirBlockNum));
-
+        getTree();
         return inodeNum;
     }
 

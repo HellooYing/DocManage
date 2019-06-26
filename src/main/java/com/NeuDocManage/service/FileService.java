@@ -89,6 +89,10 @@ public class FileService {
         return r;
     }
 
+//    public static INode findFileOnCur(String fullName){
+//
+//    }
+
     /**
      * 根据文件全名（/root/hhh）查找内存中的索引节点
      * @param fullName
@@ -193,25 +197,44 @@ public class FileService {
         for(INode iNode:file){
             if(iNode.getFileName().equals(fileName)){
                 deleteFileByINode(iNode);
+                getTree();
                 return true;
             }
         }
         for(INode iNode:dir){
             if(iNode.getFileName().equals(fileName)){
                 deleteFileByINode(iNode);
+                getTree();
                 return true;
             }
         }
         return false;
     }
 
+//    public static boolean deleteAllFile(String fileName){
+//
+//    }
+
     /**
      * 递归的删除文件
      * @param node
      */
-//    public static boolean deleteAllFileByINode(INode node){
-//
-//    }
+    public static void deleteAllFileByINode(INode node){
+        if(node.getType()==2){
+            deleteFileByINode(node);
+        }
+        else if(node.getType()==1) {
+            List<INode> file = node.getFileSon();
+            List<INode> dir = node.getDirSon();
+            for (INode iNode : file) {
+                deleteFileByINode(iNode);
+            }
+            for (INode iNode : dir) {
+                deleteAllFileByINode(iNode);
+            }
+            deleteFileByINode(node);
+        }
+    }
 
     /**
      * 根据内存i节点，格式化索引区及内存区相关的块，并回收这些块以供下次分配
@@ -277,7 +300,7 @@ public class FileService {
         //写入磁盘
         writeBlock(inodeNum, JSON.toJSONString(inode));
         writeBlock(dataBlockNum, JSON.toJSONString(dataBlock));
-
+        getTree();
         return inodeNum;
     }
 
@@ -396,6 +419,7 @@ public class FileService {
         nowInode.setSize(512*(contents.size()-1)+contents.get(contents.size()-1).length()+48); //设置好内存大小
         System.out.println(JSON.toJSONString(nowInode)+"\nwith change\n"+JSON.toJSONString(nowData));
         overwriteBlock(headId,JSON.toJSONString(nowInode));
+        getTree();
         return true;
     }
 
