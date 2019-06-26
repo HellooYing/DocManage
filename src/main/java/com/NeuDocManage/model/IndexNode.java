@@ -1,5 +1,7 @@
 package com.NeuDocManage.model;
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -128,5 +130,9 @@ public class IndexNode extends Block{
 
     public void setIndirectData(int indirectData) {
         this.indirectData = indirectData;
+    }
+
+    public void print(){
+        System.out.println(JSON.toJSONString(this));
     }
 }

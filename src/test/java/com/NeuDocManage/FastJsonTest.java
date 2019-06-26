@@ -41,6 +41,11 @@ public class FastJsonTest {
         String jsonObject = JSON.toJSONString(dataBlock);
         Block block = JSON.parseObject(jsonObject, Block.class);
         assertEquals("DataBlock",block.getName());
+
+        Block block1=new Block("123");
+        String jsonObject2 = JSON.toJSONString(block1);
+        DataBlock dataBlock2=JSON.parseObject(jsonObject2, DataBlock.class);
+        assertEquals("123",dataBlock2.getName());
     }
 
     /**

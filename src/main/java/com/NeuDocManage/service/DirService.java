@@ -18,21 +18,6 @@ import static com.NeuDocManage.service.DataService.getDataBlock;
 import static com.NeuDocManage.service.INodeServie.getIndexBlock;
 
 public class DirService {
-    //目录块有关操作
-    //目录有关操作
-    //下面三个都是假的!
-
-//    private static int CurDir = 1;
-//
-//    public static void setCurDir(int dirId){
-//        CurDir = dirId;
-//    }
-//
-//    private static int getCurDir(){
-//        //假的
-//        return CurDir;
-//    }
-
     public static void showInfo(int inodeId) {
         IndexNode inode = JSON.parseObject(readBlock(inodeId).trim(), IndexNode.class);
         System.out.println( "Name: "+inode.getFileName()+"\t"+
@@ -220,7 +205,4 @@ public class DirService {
         }
         return result;
     }
-
-
-
 }

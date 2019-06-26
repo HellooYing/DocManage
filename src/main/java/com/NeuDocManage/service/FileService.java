@@ -1,9 +1,6 @@
 package com.NeuDocManage.service;
 
-import com.NeuDocManage.model.DataBlock;
-import com.NeuDocManage.model.DirBlock;
-import com.NeuDocManage.model.HostHolder;
-import com.NeuDocManage.model.IndexNode;
+import com.NeuDocManage.model.*;
 import com.alibaba.fastjson.JSON;
 
 import java.util.ArrayList;
@@ -11,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.NeuDocManage.config.MainConfig.BLOCKNUM;
+import static com.NeuDocManage.config.MainConfig.INODEBLOCKSTART;
 import static com.NeuDocManage.model.HostHolder.getCurDir;
 import static com.NeuDocManage.service.BlockService.*;
 import static com.NeuDocManage.service.BlockService.readBlock;
@@ -18,6 +16,202 @@ import static com.NeuDocManage.service.DataService.getDataBlock;
 import static com.NeuDocManage.service.INodeServie.getIndexBlock;
 
 public class FileService {
+    public static INode root;
+    /**
+     * 获取整个文件系统目录结构，从磁盘中将i节点都读到内存，以后都从内存中查找
+     */
+    public static void getTree(){
+        root=JSON.parseObject(readBlock(INODEBLOCKSTART).trim(),INode.class);
+        getSon(root);
+    }
+    private static void getSon(INode node){
+        DirBlock node2=JSON.parseObject(readBlock(node.getIndirectData()).trim(),DirBlock.class);
+        for(int i:node2.getSonDataId()){
+            INode fileSon=JSON.parseObject(readBlock(i).trim(),INode.class);
+            fileSon.setFather(node);
+            node.addFileSon(fileSon);
+        }
+        for(int i:node2.getSonDirId()){
+            INode dirSon=JSON.parseObject(readBlock(i).trim(),INode.class);
+            dirSon.setFather(node);
+            getSon(dirSon);
+            node.addDirSon(dirSon);
+        }
+    }
+
+    /**
+     * 打印目录结构
+     */
+    public static void printTree(){
+        if(root==null) getTree();
+        System.out.println(root.getFileName());
+        printTree(1,root.getDirSon(),root.getFileSon());
+    }
+
+    private static void printTree(int level,List<INode> dir,List<INode> file){
+        for(INode node:file){
+            for (int i = 0; i <level ; i++) {
+                System.out.print("  ");
+            }
+            System.out.println(node.getFileName());
+        }
+        for(INode node:dir){
+            for (int i = 0; i <level ; i++) {
+                System.out.print("--");
+            }
+            System.out.println(node.getFileName());
+            printTree(level+1,node.getDirSon(),node.getFileSon());
+        }
+    }
+
+    /**
+     * 查找文件
+     * @param fileName
+     * @return 文件在内存中的索引节点
+     */
+    public static List<INode> findFile(String fileName){
+        if(root==null) getTree();
+        return find(fileName,root);
+    }
+    private static List<INode> find(String fileName,INode node){
+        List<INode> r=new ArrayList<>();
+        List<INode> file=node.getFileSon();
+        List<INode> dir=node.getDirSon();
+        for(INode iNode:file){
+            if(iNode.getFileName().equals(fileName)) r.add(iNode);
+        }
+        for(INode iNode:dir){
+            if(iNode.getFileName().equals(fileName)) r.add(iNode);
+            r.addAll(find(fileName,iNode));
+        }
+        return r;
+    }
+
+    /**
+     * 根据文件全名（/root/hhh）查找内存中的索引节点
+     * @param fullName
+     * @return
+     */
+    public static INode findFileByFullName(String fullName){
+        if(!fullName.substring(0,5).equals("/root")){
+            System.out.println("输入非全名！");
+            return null;
+        }
+        fullName=fullName.substring(1);
+        String[] names=fullName.split("/");
+        if(root==null) getTree();
+        INode node=root;
+        for (int i = 1; i <names.length-1 ; i++) {
+            String dir=names[i];
+            INode dir2=null;
+            for(INode n:node.getDirSon()){
+                if(n.getFileName().equals(dir)){
+                    dir2=n;
+                    break;
+                }
+            }
+            if(dir2==null){
+                System.out.println("该目录不存在！");
+                return null;
+            }
+            else{
+                node=dir2;
+                continue;
+            }
+        }
+        String file=names[names.length-1];
+        for(INode n:node.getFileSon()){
+            if(n.getFileName().equals(file)){
+                return n;
+            }
+        }
+        for(INode n:node.getDirSon()){
+            if(n.getFileName().equals(file)){
+                return n;
+            }
+        }
+        System.out.println("该目录不存在！");
+        return null;
+    }
+
+    public static String getFullName(INode node){
+        StringBuilder r=new StringBuilder();
+        while (node.getFather()!=null){
+            r.insert(0,node.getFileName());
+            r.insert(0,"/");
+            node=node.getFather();
+        }
+        r.insert(0,node.getFileName());
+        r.insert(0,"/");
+        return r.toString();
+    }
+
+    /**
+     * 根据id查找内存i节点
+     * @param id
+     * @param node
+     * @return 内存i节点
+     */
+    public static INode getINodeById(int id,INode node){
+        List<INode> file=node.getFileSon();
+        List<INode> dir=node.getDirSon();
+        for(INode iNode:file){
+            if(iNode.getId()==id) return iNode;
+        }
+        for(INode iNode:dir){
+            if(iNode.getId()==id) return iNode;
+            else {
+                INode node1=getINodeById(id,iNode);
+                if(node1!=null) return node1;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 获取内存i节点类型的当前目录
+     * @return INode CurDir
+     */
+    public static INode getCurDir(){
+        IndexNode node=HostHolder.getCurDir();
+        INode r=getINodeById(node.getId(),root);
+        return r;
+    }
+
+    /**
+     * 在当前目录删除一个文件或空目录
+     * @param fileName
+     * @return 是否成功
+     */
+    public static boolean deleteOneFile(String fileName){
+        INode cur=getCurDir();
+        List<INode> file=cur.getFileSon();
+        List<INode> dir=cur.getDirSon();
+        for(INode iNode:file){
+            if(iNode.getFileName().equals(fileName)){
+                if(deleteFileByINode(iNode)) return true;
+                else return false;
+            }
+        }
+        for(INode iNode:dir){
+            if(iNode.getFileName().equals(fileName)){
+                if(deleteFileByINode(iNode)) return true;
+                else return false;
+            }
+        }
+        return false;
+    }
+
+    public static boolean deleteFileByINode(INode node){
+//        List<Integer> deleteList=new ArrayList<>();
+//        deleteList.add(node.getId());
+//        int id=node.getIndirectData();
+//        while(id!=null){
+//
+//        }
+        return false;
+    }
+
     //文件有关操作
     public static int createFile(String fileName) {
         //创建一个文件,返回的是该文件的i节点号(创建失败返回BLOCKNUM - 1)

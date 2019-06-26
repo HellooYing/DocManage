@@ -73,7 +73,7 @@ public class DiskService {
             IndexNode rootNode=JSON.parseObject(readBlock(INODEBLOCKSTART).trim(),IndexNode.class);
             HostHolder.setCurDir(rootNode);
         }
-
+        FileService.getTree();
     }
 
     public static void releaseDisk(){

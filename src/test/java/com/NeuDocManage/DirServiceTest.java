@@ -32,7 +32,6 @@ public class DirServiceTest {
      */
     @Test
     public void test2() throws IOException{
-
         initDisk();//初始化磁盘
         int id = mkdir("name");
         //System.out.println(id);
@@ -43,8 +42,8 @@ public class DirServiceTest {
         IndexNode inode2= JSON.parseObject(readBlock(id2).trim(),IndexNode.class);
         HostHolder.setCurDir(inode2); //设置当前目录是aaa
         int id3 = mkdir("bbb");
-        HostHolder.setCurDir(inode); //设置当前目录是name
-        assertEquals(id3,changeDir("./aaa/bbb"));
+        //HostHolder.setCurDir(inode); //设置当前目录是name
+        assertEquals(id2,changeDir("./../aaa"));
         releaseDisk();
     }
 
