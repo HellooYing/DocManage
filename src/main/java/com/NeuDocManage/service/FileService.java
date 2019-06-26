@@ -233,7 +233,6 @@ public class FileService {
             recoverDataBlock(i);//回收数据块
         }
     }
-
     //文件有关操作
     public static int createFile(String fileName) {
         //创建一个文件,返回的是该文件的i节点号(创建失败返回BLOCKNUM - 1)
@@ -284,6 +283,7 @@ public class FileService {
 
     public static boolean writeFile(String fileName,String content){
         //往文件里头写东西
+
         //首先找到这个文件
         int fileId = -1;
         int headId = -1; //表示这个文件的头Id
@@ -292,24 +292,25 @@ public class FileService {
         for(Integer x : nowDir.getSonDataId()){
             nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
             if(nowInode.getFileName().equals(fileName)){
-                headId = nowInode.getId();
+                //找到同名文件
+                headId = nowInode.getId(); //headId表示文件的I结点了
                 System.out.println("headId: "+headId);
                 fileId = nowInode.getIndirectData();
                 //找到这个文件结尾的Id
                 DataBlock nowData = JSON.parseObject(readBlock(fileId).trim(), DataBlock.class);
                 int nextId = nowData.getNextDataId();
                 while(nextId !=BLOCKNUM - 1){
-                    nowInode = JSON.parseObject(readBlock(nextId).trim(), IndexNode.class);
-                    nowData =JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
+                    //nowInode = JSON.parseObject(readBlock().trim(), IndexNode.class);
+                    nowData =JSON.parseObject(readBlock(nextId).trim(), DataBlock.class);
+                    fileId = nextId; //fileId表示当前文件的磁盘块号
                     nextId = nowData.getNextDataId();
                 }
-                fileId = nowInode.getIndirectData();
             }
         }
-        if(fileId == -1){
+        if(headId == -1){
             return false; //没找到
         }
-        System.out.println(fileId);
+        //System.out.println(fileId);
         DataBlock nowData = JSON.parseObject(readBlock(fileId).trim(), DataBlock.class);
         //在文件结尾写，所以先把结尾连接上去
         if(!nowData.getData().equals("")){
@@ -330,45 +331,46 @@ public class FileService {
         }
         contents.add(content.substring(beginIndex));
 
-        IndexNode inode = new IndexNode();
+        //IndexNode inode = new IndexNode();
         //先写末尾结点
         int newData = -1;
-        int newInode = -1;
+        int oldData = -1;
+        //int newInode = -1;
         if(contents.size() > 1) {
             newData = getDataBlock();
-            newInode = getIndexBlock();
-            nowData.setNextDataId(newInode);
+            //newInode = getIndexBlock();
+            nowData.setNextDataId(newData);
         }
         nowData.setData(contents.get(0)); //替换数据
         System.out.println("Write in:"+fileId+"\n"+JSON.toJSONString(nowData));
-        System.out.println(overwriteBlock(fileId,JSON.toJSONString(nowData)));
+        overwriteBlock(fileId,JSON.toJSONString(nowData)); //写入
         System.out.println("length: "+JSON.toJSONString(nowData).length());
 
-        System.out.println("headid:"+headId);
-        nowInode = JSON.parseObject(readBlock(headId).trim(), IndexNode.class);
-        nowData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
-        System.out.println(JSON.toJSONString(nowInode)+"\nwithout change\n"+JSON.toJSONString(nowData));
+//        System.out.println("headid:"+headId);
+//        nowInode = JSON.parseObject(readBlock(headId).trim(), IndexNode.class);
+//        nowData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
+//        System.out.println(JSON.toJSONString(nowInode)+"\nwithout change\n"+JSON.toJSONString(nowData));
 
         for (int i = 1; i < contents.size(); i++) {
-            System.out.println("newData:"+newData+"\nnewInode:"+newInode);
+            //System.out.println("newData:"+newData+"\nnewInode:"+newInode);
             String nowContent = contents.get(i);
             //首先写入其他信息
-            //写入i节点信息
-            inode.setId(newInode);
-            inode.setType(2);
-
-            //mode是空的，表示只有root和自己能有全部权限
-            inode.setUsed(true);
-            inode.setSize(512); //一块数据512
-
-            inode.setFileName(fileName);
-            inode.setCreator(HostHolder.getUser().getUserName());
-
-            inode.setCreateTime(new Date());
-            inode.setChangeTime(new Date());
-
-            //inode.setOffset(dataBlockNum); ??
-            inode.setIndirectData(newData); //指向所指的磁盘块
+//            //写入i节点信息
+//            inode.setId(newInode);
+//            inode.setType(2);
+//
+//            //mode是空的，表示只有root和自己能有全部权限
+//            inode.setUsed(true);
+//            inode.setSize(512); //一块数据512
+//
+//            inode.setFileName(fileName);
+//            inode.setCreator(HostHolder.getUser().getUserName());
+//
+//            inode.setCreateTime(new Date());
+//            inode.setChangeTime(new Date());
+//
+//            //inode.setOffset(dataBlockNum); ??
+//            inode.setIndirectData(newData); //指向所指的磁盘块
 
             //写新的数据区
             DataBlock dataBlock = new DataBlock();
@@ -377,16 +379,16 @@ public class FileService {
             dataBlock.setData(nowContent); //写入当前数据
             dataBlock.setUsed(true);
 
-            writeBlock(newInode,JSON.toJSONString(inode));
+            //writeBlock(newInode,JSON.toJSONString(inode));
             writeBlock(newData,JSON.toJSONString(dataBlock));
-            System.out.println("i+1:"+(int)(i+1)+(contents.size() - 1));
+            //System.out.println("i+1:"+(int)(i+1)+(contents.size() - 1));
             if(i !=  contents.size() - 1) {
                 //如果这个结点的下个结点不是最后一个结点
-                newInode = getIndexBlock();
-                dataBlock.setNextDataId(newInode);
-                overwriteBlock(newData,JSON.toJSONString(dataBlock));
+                //newInode = getIndexBlock();
+                oldData = newData;
                 newData = getDataBlock();
-                inode = new IndexNode();
+                dataBlock.setNextDataId(newData);
+                overwriteBlock(oldData,JSON.toJSONString(dataBlock));
             }
         }
         nowInode = JSON.parseObject(readBlock(headId).trim(), IndexNode.class);
@@ -405,14 +407,14 @@ public class FileService {
         for(Integer x : nowDir.getSonDataId()){
             nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
             if(nowInode.getFileName().equals(fileName)){
-                System.out.println("Inode: "+nowInode.getIndirectData());
+                //System.out.println("Inode: "+nowInode.getIndirectData());
                 DataBlock resData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
                 StringBuilder res = new StringBuilder();
-                System.out.println("resData: "+JSON.toJSONString(resData));
+                //System.out.println("resData: "+JSON.toJSONString(resData));
                 res.append(resData.getData());
                 while(resData.getNextDataId() != BLOCKNUM - 1){
-                    nowInode = JSON.parseObject(readBlock(resData.getNextDataId()).trim(), IndexNode.class);
-                    resData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
+                    //nowInode = JSON.parseObject(readBlock().trim(), IndexNode.class);
+                    resData = JSON.parseObject(readBlock(resData.getNextDataId()).trim(), DataBlock.class);
                     res.append(resData.getData());
                 }
                 return res.toString();
