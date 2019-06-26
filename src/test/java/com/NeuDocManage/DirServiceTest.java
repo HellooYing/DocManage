@@ -11,6 +11,7 @@ import static com.NeuDocManage.service.BlockService.readBlock;
 import static com.NeuDocManage.service.DirService.*;
 import static com.NeuDocManage.service.DiskService.initDisk;
 import static com.NeuDocManage.service.DiskService.releaseDisk;
+import static com.NeuDocManage.service.FileService.*;
 import static org.junit.Assert.assertEquals;
 
 public class DirServiceTest {
@@ -44,6 +45,28 @@ public class DirServiceTest {
         int id3 = mkdir("bbb");
         //HostHolder.setCurDir(inode); //设置当前目录是name
         assertEquals(id2,changeDir("./../aaa"));
+        releaseDisk();
+    }
+
+    /**
+     * 测试ll
+     * @throws IOException
+     */
+    @Test
+    public void test3() throws IOException{
+        initDisk();//初始化磁盘
+        int id = mkdir("name");
+        IndexNode inode= JSON.parseObject(readBlock(id).trim(),IndexNode.class);
+        HostHolder.setCurDir(inode); //设置当前目录是name
+        int id2 = createFile("hhh");
+        StringBuilder res = new StringBuilder();
+        for(int i = 0; i < 1000; ++i){
+            res.append(i+"");
+        }
+        String content = res.toString();
+        writeFile("hhh",content);
+        HostHolder.setCurDir(root);
+        ListInfo();
         releaseDisk();
     }
 

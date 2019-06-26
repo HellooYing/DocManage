@@ -358,10 +358,8 @@ public class FileService {
         //先写末尾结点
         int newData = -1;
         int oldData = -1;
-        //int newInode = -1;
         if(contents.size() > 1) {
             newData = getDataBlock();
-            //newInode = getIndexBlock();
             nowData.setNextDataId(newData);
         }
         nowData.setData(contents.get(0)); //替换数据
@@ -369,31 +367,9 @@ public class FileService {
         overwriteBlock(fileId,JSON.toJSONString(nowData)); //写入
         System.out.println("length: "+JSON.toJSONString(nowData).length());
 
-//        System.out.println("headid:"+headId);
-//        nowInode = JSON.parseObject(readBlock(headId).trim(), IndexNode.class);
-//        nowData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
-//        System.out.println(JSON.toJSONString(nowInode)+"\nwithout change\n"+JSON.toJSONString(nowData));
-
         for (int i = 1; i < contents.size(); i++) {
-            //System.out.println("newData:"+newData+"\nnewInode:"+newInode);
             String nowContent = contents.get(i);
             //首先写入其他信息
-//            //写入i节点信息
-//            inode.setId(newInode);
-//            inode.setType(2);
-//
-//            //mode是空的，表示只有root和自己能有全部权限
-//            inode.setUsed(true);
-//            inode.setSize(512); //一块数据512
-//
-//            inode.setFileName(fileName);
-//            inode.setCreator(HostHolder.getUser().getUserName());
-//
-//            inode.setCreateTime(new Date());
-//            inode.setChangeTime(new Date());
-//
-//            //inode.setOffset(dataBlockNum); ??
-//            inode.setIndirectData(newData); //指向所指的磁盘块
 
             //写新的数据区
             DataBlock dataBlock = new DataBlock();
@@ -416,9 +392,25 @@ public class FileService {
         }
         nowInode = JSON.parseObject(readBlock(headId).trim(), IndexNode.class);
         nowData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
-        nowInode.setSize(512*(contents.size()-1)+contents.get(contents.size()-1).length()+48); //设置好内存大小
+        int _size = 512*(contents.size()-1)+contents.get(contents.size()-1).length()+48;
+        nowInode.setSize(_size); //设置好内存大小
         System.out.println(JSON.toJSONString(nowInode)+"\nwith change\n"+JSON.toJSONString(nowData));
         overwriteBlock(headId,JSON.toJSONString(nowInode));
+        //级联修改所有父目录大小
+        INode inode = getINodeById(nowInode.getId(),root);
+        IndexNode father;
+        while(inode.getId() != root.getId()){
+            father = new IndexNode(inode.getFather());
+            father.setSize(father.getSize()+_size);
+            System.out.println("fq"+father.getId()+"\n"+JSON.toJSONString(father).length());
+            overwriteBlock(father.getId(),JSON.toJSONString(father));
+            father = JSON.parseObject(readBlock(father.getId()).trim(), IndexNode.class);
+            inode = getINodeById(father.getId(),root);
+        }
+        //最后等于root了还要改一遍
+        father = new IndexNode(inode);
+        father.setSize(father.getSize()+_size);
+        overwriteBlock(father.getId(),JSON.toJSONString(father));
         getTree();
         return true;
     }

@@ -44,6 +44,20 @@ public class IndexNode extends Block{
         this.indirectData=indirectData;
     }
 
+    public IndexNode(INode inode){
+        super("IndexNode");
+        this.id = inode.getId();
+        this.type = inode.getType();
+        this.used = inode.isUsed();
+        this.size = inode.getSize();
+        this.creator = inode.getCreator();
+        this.fileName=inode.getFileName();
+        this.createTime = inode.getCreateTime();
+        this.changeTime = inode.getChangeTime();
+        this.offset = inode.getOffset();
+        this.indirectData=inode.getIndirectData();
+    }
+
     public int getId() {
         return id;
     }
