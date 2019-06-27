@@ -305,6 +305,11 @@ public class FileService {
         }
     }
     //文件有关操作
+    /**
+     * 创建一个文件
+     * @param fileName
+     * @return 返回的是该文件的i节点号(创建失败返回BLOCKNUM - 1)
+     */
     public static int createFile(String fileName) {
         //创建一个文件,返回的是该文件的i节点号(创建失败返回BLOCKNUM - 1)
 
@@ -365,6 +370,12 @@ public class FileService {
         return inodeNum;
     }
 
+    /**
+     * 往文件里头写东西
+     * @param fileName
+     * @param content
+     * @return 成功返回true失败返回false
+     */
     public static boolean writeFile(String fileName,String content){
         //往文件里头写东西
 
@@ -485,6 +496,11 @@ public class FileService {
         return true;
     }
 
+    /**
+     * 读当前目录下的某个文件
+     * @param fileName
+     * @return 返回文件内容
+     */
     public static String readFile(String fileName){
         //读当前目录下的某个文件,返回文件内容
 
@@ -517,96 +533,16 @@ public class FileService {
         }
         return null; //没找到
     }
-    public static boolean canViewFile(String file){
-        INode node=fileLegality(file);
-        String now=HostHolder.getUser().getUserName();
-        // 权限是否符合
-        if(now.equals(node.getCreator())||now.equals("root")){
-            return true;
-        }
-        else if(node.getMode().size()==0){
-            System.out.println("无权限访问该文件！");
-            return false;
-        }
-        else{
-            Permissions myPermissions=getFilePermissions(node);
-            if(myPermissions==null){
-                System.out.println("无权限访问该文件！");
-                return false;
-            }
-            else{
-                if(myPermissions.canRead()) return true;
-                else {
-                    System.out.println("无权限访问该文件！");
-                    return false;
-                }
-            }
-        }
-    }
-    public static boolean canWriteFile(String file){
-        INode node=fileLegality(file);
-        String now=HostHolder.getUser().getUserName();
-        if(node==null) return false;
-        // 权限是否符合
-        if(now.equals(node.getCreator())||now.equals("root")){
-            return true;
-        }
-        else if(node.getMode().size()==0){
-            System.out.println("无权限写入该文件！");
-            return false;
-        }
-        else{
-            Permissions myPermissions=getFilePermissions(node);
-            if(myPermissions==null){
-                System.out.println("无权限写入该文件！");
-                return false;
-            }
-            else{
-                if(myPermissions.canRead()&&myPermissions.canWrite()) return true;
-                else {
-                    System.out.println("无权限写入该文件！");
-                    return false;
-                }
-            }
-        }
-    }
+//    boolean rename(String oldName, String newName){
+//
+//    }
 
-    private static Permissions getFilePermissions(INode node){
-        return getDirPermissions(node);
-    }
-
-    private static INode fileLegality(String file){
-        INode node;
-        if(file.substring(0,1).equals("/")) node=findFileByFullName(file);// 如果fileName是文件全名
-        else node=findFileOnCur(file);// 否则就在当前目录查询
-        if(node==null){
-            System.out.println("找不到该文件！");
-            return null;
-        }
-//        // 是否为文件
-//        if(node.getType()!=2){
-//            System.out.println("输入非文件，无法访问");
-//            return null;
-//        }
-        return node;
-    }
-
-    public static void chmod(String fileName,String param){
-        INode node;
-        if(fileName.substring(0,1).equals("/")) node=findFileByFullName(fileName);//如果fileName是文件全名
-        else node=findFileOnCur(fileName);//否则就在当前目录查询
-        if(node==null){
-            System.out.println("文件不存在！");
-            return;
-        }
-        if(param.substring(0,1).equals("-")) param=param.substring(1);
-        Permissions p=new Permissions();
-        p.chmod(param);
-        node.addMode(p);
-        IndexNode indexNode=new IndexNode(node);
-        overwriteBlock(indexNode.getId(),JSON.toJSONString(indexNode));
-    }
-
+    /**
+     * 找路径下是否存在子文件
+     * @param dirId 路径
+     * @param FileName 子文件名
+     * @return 成功返回i节点号，失败返回-1
+     */
     private static int findSubFile(int dirId, String FileName){
         //找一个目录的子文件
         //System.out.println(dirName);

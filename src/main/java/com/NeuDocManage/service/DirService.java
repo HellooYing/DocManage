@@ -107,7 +107,10 @@ public class DirService {
         }
         return node;
     }
-
+    /**
+     * 根据某个I结点编号返回它的格式化信息
+     * @param inodeId
+     */
     public static void showInfo(int inodeId) {
         IndexNode inode = JSON.parseObject(readBlock(inodeId).trim(), IndexNode.class);
         String name = inode.getFileName();
@@ -122,9 +125,14 @@ public class DirService {
                 "ChangeTime: "+inode.getChangeTime());
     }
 
+    /**
+     * 找一个目录的子目录
+     * @param dirId
+     * @param dirName
+     * @return 找到了返回子目录的i节点号，否则返回-1
+     */
     private static int findSubDir(int dirId, String dirName){
         //找一个目录的子目录
-        //System.out.println(dirName);
         IndexNode nowInode = JSON.parseObject(readBlock(dirId).trim(), IndexNode.class);
         DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DirBlock.class);
         if(nowDir.getSonDirId().size() == 0){
@@ -137,10 +145,16 @@ public class DirService {
                     return nowInode.getId();
                 }
             }
+            //System.out.println(dirId+""+dirName);
             return -1; //没有
         }
     }
 
+    /**
+     * 创建一个目录
+     * @param dirName 目录名字或者路径+目录名字
+     * @return 返回目录的i结点号，创建失败返回BLOCKNUM-1s
+     */
     public static int mkdir(String dirName) {
         //创建一个目录,返回的是该目录的i节点号(创建失败返回 - 1)
 
@@ -221,10 +235,18 @@ public class DirService {
         return inodeNum;
     }
 
+    /**
+     * 用来递归解析子目录的自动机
+     * @param dirName
+     * @return i节点号+目录名
+     */
     private static Pair<Integer,String> cdAutomation(Pair<Integer,String> dirName){
         //目录自动机
-        if(dirName.getKey().equals("")){
+        if(dirName.getValue().equals("")){
             return dirName;
+        }
+        if(dirName.getValue().substring(0,1).equals("/")){
+            dirName = new Pair<>(dirName.getKey(),dirName.getValue().substring(1));
         }
         //System.out.println(dirName.getKey()+" "+dirName.getValue());
         if(dirName.getKey() == -1){
@@ -234,17 +256,8 @@ public class DirService {
         }else{
             String dir = dirName.getValue().trim();
             String subDir[] = dir.split("\\/");
-            /*
-            if(subDir[0].equals("")&&subDir.length == 2){
-                String temp = subDir[0];
-                subDir[0] = subDir[1];
-                subDir[1] = temp;
-            }
-            /
-             */
             int find = findSubDir(dirName.getKey(),subDir[0]);
             if(find != -1){
-                //System.out.println("fuckyou");
                 if(subDir.length == 1){
 
                     //就剩一个目录了，直接返回
@@ -268,8 +281,13 @@ public class DirService {
         }
     }
 
+    /**
+     * 解析路径
+     * @param dirName 路径
+     * @return i结点号
+     */
     public static IndexNode changeDir(String dirName){
-        //更换目录，对应cd指令,返回进入的目录的i节点号
+        //解析路径返回进入的目录的i节点号
         /*
         if(!dirName.matches("^[\\/](\\w+\\/?)+$")){
             return -1; //输入进来的路径不合法
@@ -297,6 +315,7 @@ public class DirService {
             IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
             DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DirBlock.class);
             cur = nowDir.getFaDirId();
+            dirName = dirName.replaceFirst("..","");
         }
         //System.out.println(cur+" "+dirName);
         Pair<Integer, String> res = cdAutomation(new Pair<Integer, String>(cur,dirName));
@@ -307,6 +326,11 @@ public class DirService {
         }
     }
 
+    /**
+     * 输出路径下所有子目录和子文件的名字
+     * @param dirName 路径
+     * @return 一个存名字的list
+     */
     public static List<String> listDir(String dirName){
 
         int curDir = getCurDir().getId();
@@ -331,6 +355,10 @@ public class DirService {
         return result;
     }
 
+    /**
+     * 格式化输出路径下的文件信息
+     * @param dirName
+     */
     public static void ListInfo(String dirName){
 
         int curDir = getCurDir().getId();
