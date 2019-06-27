@@ -33,7 +33,7 @@ public class FileServiceTest {
         int id3 = mkdir("bbb2");
         HostHolder.setCurDir(inode); //设置当前目录是name
         int id4 = createFile("hhh2");
-        for(String s : listDir()){
+        for(String s : listDir("")){
             System.out.println(s+" ");
         }
         releaseDisk();
@@ -55,7 +55,7 @@ public class FileServiceTest {
         String content = res.toString();
         writeFile("hhh",content);
         //writeFile("hhh","12");
-        showInfo(id);
+        //showInfo(id);
         assertEquals(content,readFile("hhh"));
         releaseDisk();
     }
@@ -68,10 +68,5 @@ public class FileServiceTest {
         System.out.println(findFileByFullName("/root/hhh"));
         System.out.println(getFullName(findFileByFullName("/root/hhh")));
         System.out.println(getINodeById(2,root));
-        deleteAllFile("name2");
-        deleteAllFile("name3");
-        deleteOneFile("hhh");
-        printTree();
-        releaseDisk();
     }
 }

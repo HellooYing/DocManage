@@ -17,8 +17,10 @@ import static com.NeuDocManage.service.INodeServie.getIndexBlock;
 
 public class DirService {
     public static boolean canViewDir(String dir){
+        if(dir.equals("..")) return true;
         INode node=dirLegality(dir);
         String now=HostHolder.getUser().getUserName();
+        if(node==null) return false;
         // 权限是否符合
         // 如果当前用户是root或目录创建者，则肯定可以访问
         if(now.equals(node.getCreator())||now.equals("root")){
@@ -108,7 +110,11 @@ public class DirService {
 
     public static void showInfo(int inodeId) {
         IndexNode inode = JSON.parseObject(readBlock(inodeId).trim(), IndexNode.class);
-        System.out.println( "Name: "+inode.getFileName()+"\t"+
+        String name = inode.getFileName();
+        if(inode.getType() == 1){
+            name = inode.getFileName()+"/";
+        }
+        System.out.println( "Name: "+name+"\t"+
                 "Type: "+inode.getType()+"\t"+
                 "Size: "+inode.getSize()+"\t"+
                 "Creator: "+inode.getCreator()+"\t"+
@@ -138,8 +144,19 @@ public class DirService {
     public static int mkdir(String dirName) {
         //创建一个目录,返回的是该目录的i节点号(创建失败返回 - 1)
 
+        String[] subdir = dirName.split("\\/");
+        if(dirName.substring(dirName.length()-1,dirName.length()).equals("\\/")){
+            dirName=dirName.substring(0,dirName.length()-1);
+        }
+        dirName = dirName.replaceFirst(subdir[subdir.length-1],"");
+        if(changeDir(dirName) == null){
+            return -1;
+        }
+        int curDir = changeDir(dirName).getId();
+        dirName = subdir[subdir.length-1];
+
         //当前目录下已经有同名文件，返回-2
-        if(findSubDir(getCurDir().getId(),dirName) != -1){
+        if(findSubDir(curDir,dirName) != -1){
             return -2;
         }
 
@@ -173,7 +190,7 @@ public class DirService {
         dirBlock.setIndexId(inodeNum);
 
         //System.out.println(getCurDir().getId());
-        dirBlock.setFaDirId(getCurDir().getId()); //父目录设置为当前目录，如果在初始化root目录时需要设置为空
+        dirBlock.setFaDirId(curDir); //父目录设置为当前目录，如果在初始化root目录时需要设置为空
 
         //新建目录以下两项都是空
         //dirBlock.setSonDirId(BLOCKNUM - 1); //表示没有
@@ -181,7 +198,7 @@ public class DirService {
 
 
         //寻找父亲目录的子目录，添加到子目录(root还没有)
-        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+        IndexNode nowInode = JSON.parseObject(readBlock(curDir).trim(), IndexNode.class);
         DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DirBlock.class);
         List<Integer> sonDir = nowDir.getSonDirId();
         sonDir.add(inodeNum);
@@ -206,6 +223,9 @@ public class DirService {
 
     private static Pair<Integer,String> cdAutomation(Pair<Integer,String> dirName){
         //目录自动机
+        if(dirName.getKey().equals("")){
+            return dirName;
+        }
         System.out.println(dirName.getKey()+" "+dirName.getValue());
         if(dirName.getKey() == -1){
             return dirName; //出错了
@@ -248,17 +268,29 @@ public class DirService {
         }
     }
 
-    public static int changeDir(String dirName){
+    public static IndexNode changeDir(String dirName){
         //更换目录，对应cd指令,返回进入的目录的i节点号
         /*
         if(!dirName.matches("^[\\/](\\w+\\/?)+$")){
             return -1; //输入进来的路径不合法
         }
         */
+        if(dirName.equals("")){
+            return getCurDir();
+        }
         int cur = SUPERBLOCKSTART+SUPERBLOCKNUM; //默认从root开始解析
         String subDir[] = dirName.split("\\/");
         if(!subDir[0].equals(".") && !subDir[0].equals("..")) {
-            dirName.replaceFirst("\\/roor\\/","");
+            if(!subDir[0].equals("root") &&(subDir.length > 1 &&!subDir[1].equals("root"))) {
+                //System.out.println("fukc");
+                if(dirName.substring(0,1).equals("/")){
+                    dirName=dirName.replaceFirst("\\/","");
+                }
+                cur = getCurDir().getId();
+            }
+            //System.out.println("Fuck!!!");
+            dirName = dirName.replaceFirst("\\/root\\/","");
+            System.out.println(dirName);
         }else if(subDir[0].equals(".")){
             cur = getCurDir().getId();
         }else{
@@ -269,17 +301,22 @@ public class DirService {
         //System.out.println(cur+" "+dirName);
         Pair<Integer, String> res = cdAutomation(new Pair<Integer, String>(cur,dirName));
         if(res.getKey() == -1){
-            return -2; //没找到
+            return null; //没找到
         }else{
-            return res.getKey();
+            return JSON.parseObject(readBlock(res.getKey()).trim(), IndexNode.class);
         }
     }
 
-    public static List<String> listDir(){
+    public static List<String> listDir(String dirName){
+
+        int curDir = getCurDir().getId();
+        if(changeDir(dirName) != null)
+            curDir = changeDir(dirName).getId();
+
         //对应ls指令，列出所有子文件,存到一个List<String>里面
         //找一个目录的子目录
         List<String> result = new ArrayList<String>();
-        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+        IndexNode nowInode = JSON.parseObject(readBlock(curDir).trim(), IndexNode.class);
         DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DirBlock.class);
         //先读取所有目录输出
         for(Integer x : nowDir.getSonDirId()){
@@ -292,5 +329,24 @@ public class DirService {
             result.add(nowInode.getFileName());
         }
         return result;
+    }
+
+    public static void ListInfo(String dirName){
+
+        int curDir = getCurDir().getId();
+        if(changeDir(dirName) != null)
+            curDir = changeDir(dirName).getId();
+
+        List<String> result = new ArrayList<String>();
+        IndexNode nowInode = JSON.parseObject(readBlock(curDir).trim(), IndexNode.class);
+        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DirBlock.class);
+        //先读取所有目录输出
+        for(Integer x : nowDir.getSonDirId()){
+            showInfo(x);
+        }
+        //再读取所有子文件输出
+        for(Integer x : nowDir.getSonDataId()){
+            showInfo(x);
+        }
     }
 }

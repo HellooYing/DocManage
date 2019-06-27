@@ -34,17 +34,17 @@ public class DirServiceTest {
     @Test
     public void test2() throws IOException{
         initDisk();//初始化磁盘
-        int id = mkdir("name3");
+        int id = mkdir("name");
         //System.out.println(id);
         IndexNode inode= JSON.parseObject(readBlock(id).trim(),IndexNode.class);
         //System.out.println("bbb"+readBlock(id));
         HostHolder.setCurDir(inode); //设置当前目录是name
-        int id2 = mkdir("aaa3");
+        int id2 = mkdir("aaa");
         IndexNode inode2= JSON.parseObject(readBlock(id2).trim(),IndexNode.class);
         HostHolder.setCurDir(inode2); //设置当前目录是aaa
-        int id3 = mkdir("bbb3");
-        //HostHolder.setCurDir(inode); //设置当前目录是name
-        assertEquals(id2,changeDir("./../aaa3"));
+        int id3 = mkdir("bbb");
+        HostHolder.setCurDir(root); //设置当前目录是root
+        assertEquals(id2,changeDir("/name/aaa/").getId());
         releaseDisk();
     }
 
@@ -66,6 +66,7 @@ public class DirServiceTest {
         String content = res.toString();
         writeFile("hhh",content);
         HostHolder.setCurDir(root);
+        ListInfo("");
         releaseDisk();
     }
 

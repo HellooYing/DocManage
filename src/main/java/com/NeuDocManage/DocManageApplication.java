@@ -32,6 +32,7 @@ public class DocManageApplication {
                 break;
             }
             else if(input.equals("n")){
+                initDisk();
                 break;
             }
             else{
@@ -40,7 +41,8 @@ public class DocManageApplication {
         }
         System.out.println("您好，用户root。现在时间是"+new Date()+",输入help可获取指令列表。");
         while (true){
-            System.out.print("root@docManage:"+getCurDir().getFileName()+"#");
+            String cur=getFullName(getINodeById(getCurDir().getId(),root));
+            System.out.print("root@docManage:"+cur+"#");
             input=scanner.nextLine().toLowerCase();
             String order=input.trim().split(" ")[0];
             String[] word;
@@ -62,7 +64,9 @@ public class DocManageApplication {
                     System.out.println("exit : 退出文件系统");
                     break;
                 case "exit":
+                    releaseDisk();
                     System.out.println("再见！");
+                    System.exit(0);
                     break;
                 case "ls":
                     // 1.是否有目录参数，目录参数是否合法
@@ -70,7 +74,7 @@ public class DocManageApplication {
                     // 3.调用函数
                     word=input.split(" ");
                     if(word.length==1){//如果没有目录参数,就在当前目录ls
-                        List<String> dirs=listDir();
+                        List<String> dirs=listDir("");
                         for(String s:dirs){
                             System.out.print(s+" ");
                         }
@@ -83,18 +87,35 @@ public class DocManageApplication {
                         if(canViewDir(word[1])){
                             IndexNode now=getCurDir();
                             setCurDir(changeDir(word[1]));
-                            List<String> dirs=listDir();
+                            List<String> dirs=listDir("");
                             for(String s:dirs){
                                 System.out.print(s+" ");
                             }
                             setCurDir(now);
                         }
                     }
+                    System.out.println();
                     break;
                 case "ll":
                     // 1.是否有目录参数，目录参数是否合法
                     // 2.当前用户是否拥有读该目录的权限
                     // 3.调用函数
+                    word=input.split(" ");
+                    if(word.length==1){//如果没有目录参数,就在当前目录ls
+                        ListInfo("");
+                    }
+                    else if(word.length!=2){
+                        System.out.println("参数不合法！");
+                        break;
+                    }
+                    else{//有目录参数的话，检测是否有权限访问该目录，ls该目录的内容
+                        if(canViewDir(word[1])){
+                            IndexNode now=getCurDir();
+                            setCurDir(changeDir(word[1]));
+                            ListInfo("");
+                            setCurDir(now);
+                        }
+                    }
                     break;
                 case "cd":
                     // 1.目录参数是否合法
@@ -112,8 +133,13 @@ public class DocManageApplication {
                 case "mkdir":
                     word=input.split(" ");
                     if(word.length==2){
-                        if(mkdir(word[1])==-1){
+                        int status=mkdir(word[1]);
+                        if(status==-1){
                             System.out.println("创建失败");
+                            break;
+                        }
+                        else if(status==-1){
+                            System.out.println("已有同名目录！");
                             break;
                         }
                     }
