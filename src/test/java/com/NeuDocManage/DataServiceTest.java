@@ -32,7 +32,7 @@ public class DataServiceTest {
 
     /**
      * 测试recoverDataBlock(blockId)，先分配再回收，下次分配的与上次回收的相同，多次分配回收盘块结果也相同。
-     * @throws IOException
+     * @throws IOException IO异常
      */
     @Test
     public void test2() throws IOException {

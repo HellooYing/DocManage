@@ -77,7 +77,7 @@ public class FileService {
 
     /**
      * 查找文件
-     * @param fileName
+     * @param fileName 文件名
      * @return 文件在内存中的索引节点
      */
     public static List<INode> findFile(String fileName){
@@ -100,8 +100,8 @@ public class FileService {
 
     /**
      * 在当前目录查找文件，返回内存i节点
-     * @param fileName
-     * @return
+     * @param fileName 文件名
+     * @return 内存i节点
      */
     public static INode findFileOnCur(String fileName){
         String[] fileDir=fileName.split("/");
@@ -133,8 +133,8 @@ public class FileService {
 
     /**
      * 根据文件全名（/root/hhh）查找内存中的索引节点
-     * @param fullName
-     * @return
+     * @param fullName 全名
+     * @return 索引节点
      */
     public static INode findFileByFullName(String fullName){
         if(!fullName.substring(0,5).equals("/root")){
@@ -181,8 +181,8 @@ public class FileService {
 
     /**
      * 根据内存i节点获取文件全名
-     * @param node
-     * @return
+     * @param node 内存i节点
+     * @return 文件全名
      */
     public static String getFullName(INode node){
         StringBuilder r=new StringBuilder();
@@ -198,8 +198,8 @@ public class FileService {
 
     /**
      * 根据id查找内存i节点
-     * @param id
-     * @param node
+     * @param id 索引节点id
+     * @param node 递归用，初始为root
      * @return 内存i节点
      */
     public static INode getINodeById(int id,INode node){
@@ -250,7 +250,7 @@ public class FileService {
 
     /**
      * 在当前目录删除一个文件或空目录
-     * @param fileName
+     * @param fileName 文件名
      * @return false代表没有找到该文件名对应文件，true代表已删除
      */
     public static boolean deleteOneFile(String fileName){
@@ -271,8 +271,8 @@ public class FileService {
 
     /**
      * 根据文件名递归删除文件
-     * @param fileName
-     * @return
+     * @param fileName 文件名
+     * @return 成功与否
      */
     public static boolean deleteAllFile(String fileName){
         INode node;
@@ -287,7 +287,7 @@ public class FileService {
 
     /**
      * 递归的删除文件
-     * @param node
+     * @param node 内存节点
      */
     public static void deleteAllFileByINode(INode node){
         if(node.getType()==2){
@@ -309,7 +309,7 @@ public class FileService {
     /**
      * 根据内存i节点，格式化索引区及内存区相关的块，并回收这些块以供下次分配
      * 不支持递归
-     * @param node
+     * @param node 内存节点
      */
     public static void deleteFileByINode(INode node){
         recoverIndexBlock(node.getId());//回收索引块
@@ -329,7 +329,7 @@ public class FileService {
 
     /**
      * 创建一个文件
-     * @param fileName
+     * @param fileName 文件名
      * @return 返回的是该文件的i节点号(创建失败返回BLOCKNUM - 1)
      */
     public static int createFile(String fileName) {
@@ -394,8 +394,8 @@ public class FileService {
 
     /**
      * 往文件里写入内容
-     * @param fileName
-     * @param content
+     * @param fileName 文件名
+     * @param content 写入内容
      * @return 成功返回true失败返回false
      */
     public static boolean writeFile(String fileName,String content){
@@ -520,7 +520,7 @@ public class FileService {
 
     /**
      * 读当前目录下的某个文件
-     * @param fileName
+     * @param fileName 文件名
      * @return 返回文件内容
      */
     public static String readFile(String fileName){
@@ -558,7 +558,7 @@ public class FileService {
 
     /**
      * 文件是否可读
-     * @param file
+     * @param file 文件名或地址
      * @return 是否
      */
     public static boolean canViewFile(String file){
@@ -591,7 +591,7 @@ public class FileService {
 
     /**
      * 文件是否可写
-     * @param file
+     * @param file 文件名或地址
      * @return 是否
      */
     public static boolean canWriteFile(String file){
@@ -654,8 +654,8 @@ public class FileService {
 
     /**
      * 修改文件对其他用户的权限
-     * @param fileName
-     * @param param
+     * @param fileName 文件名
+     * @param param 权限参数
      */
     public static void chmod(String fileName,String param){
         INode node;

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 public class DirServiceTest {
     /**
      * 测试mkdir
-     * @throws IOException
+     * @throws IOException IO异常
      */
     @Test
     public void test1() throws IOException {
@@ -29,7 +29,7 @@ public class DirServiceTest {
 
     /**
      * 测试cd
-     * @throws IOException
+     * @throws IOException IO异常
      */
     @Test
     public void test2() throws IOException{
@@ -50,7 +50,7 @@ public class DirServiceTest {
 
     /**
      * 测试ll
-     * @throws IOException
+     * @throws IOException IO异常
      */
     @Test
     public void test3() throws IOException{

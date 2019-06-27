@@ -22,7 +22,7 @@ public class Permissions {
      * 输入int类型权限值，修改执行、写入、读取权限
      * 如7，则三个权限都有，0则都没有
      *
-     * @param mode
+     * @param mode 权限值
      * @return 状态码 0正常，1错误
      */
     public int chmod(int mode) {
@@ -51,7 +51,7 @@ public class Permissions {
 
     /**
      * 输入类似于"rwx"/"xw"之类的权限参数，修改权限
-     * @param mode
+     * @param mode 权限参数
      * @return 状态码 0正常 1错误
      */
     public int chmod(String mode) {

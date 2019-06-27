@@ -10,7 +10,7 @@ public class BlockService {
     public static MappedByteBuffer disk= DiskService.disk;
     /**
      * 读盘块，输入盘块号，输出盘块中的内容
-     * @param blockId
+     * @param blockId 盘块号
      * @return content
      */
     public static String readBlock(int blockId){
@@ -28,8 +28,8 @@ public class BlockService {
 
     /**
      * 写盘块，输入盘块号和输入内容，写入盘块
-     * @param blockId
-     * @param content
+     * @param blockId 盘块号
+     * @param content 写入内容
      * @return 状态码 0为正常写入；1为该空间已被占用，写入失败，需要覆盖写入；2为content长度大于块的大小。
      */
     public static int writeBlock(int blockId,String content){
@@ -40,8 +40,8 @@ public class BlockService {
 
     /**
      * 覆盖重写盘块
-     * @param blockId
-     * @param content
+     * @param blockId 盘块号
+     * @param content 覆盖写入内容
      * @return 状态码
      */
     public static int overwriteBlock(int blockId,String content){
@@ -57,7 +57,7 @@ public class BlockService {
 
     /**
      * 格式化盘块，将该盘块的所有内容清空
-     * @param blockId
+     * @param blockId 盘块号
      */
     public static void formatBlock(int blockId){
         int position=blockId*BLOCKSIZE;

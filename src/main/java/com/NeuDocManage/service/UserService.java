@@ -13,8 +13,9 @@ import static com.NeuDocManage.service.BlockService.*;
 public class UserService {
     /**
      * su xxx
-     * 登录其他用户
-     * @return
+     * @param userName 用户名
+     * @param pswd 密码
+     * @return 成功与否
      */
     public static boolean login(String userName,String pswd){
         // 先查看该userName是否存在
@@ -40,7 +41,7 @@ public class UserService {
 
     /**
      * useradd xxx 注册用户
-     * @param user
+     * @param user 用户
      * @return 成功与否
      */
     public static boolean register(User user){
@@ -60,7 +61,7 @@ public class UserService {
 
     /**
      * 删除用户
-     * @param userName
+     * @param userName 用户名
      * @return 成功与否
      */
     public static boolean deleteUser(String userName){

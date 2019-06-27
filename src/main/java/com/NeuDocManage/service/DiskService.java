@@ -21,7 +21,7 @@ public class DiskService {
     public static SuperBlock superBlock;//超级块
     /**
      * 初始化磁盘，如果没有disk.txt就创建，有则打开
-     * @throws IOException
+     * @throws IOException IO异常
      */
     public static void initDisk() throws IOException {
         //创建或打开disk.txt文件，模拟磁盘
@@ -93,7 +93,7 @@ public class DiskService {
 
     /**
      * 格式化磁盘
-     * @throws IOException
+     * @throws IOException IO异常
      */
     public static void formatDisk() throws IOException {
         try{

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 public class FileServiceTest {
     /**
      * 测试ls createFile
-     * @throws IOException
+     * @throws IOException IO异常
      */
     @Test
     public void test1() throws IOException{
@@ -40,7 +40,7 @@ public class FileServiceTest {
     }
     /**
      * 测试读写文件
-     * @throws IOException
+     * @throws IOException IO异常
      */
     @Test
     public void test2()throws IOException{

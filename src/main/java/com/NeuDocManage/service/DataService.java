@@ -30,7 +30,7 @@ public class DataService {
 
     /**
      * 回收盘块，将盘块清空，再将盘块号加到栈中，以供下次重新分配。
-     * @param blockId
+     * @param blockId 盘块号
      */
     public static void recoverDataBlock(int blockId){
         if(blockStack==null||blockStack.size()==0){//如果blockStack未初始化，则说明是重启后第一次调用本函数，要从超级块中获取盘块栈的信息。

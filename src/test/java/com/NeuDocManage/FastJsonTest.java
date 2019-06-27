@@ -50,6 +50,7 @@ public class FastJsonTest {
 
     /**
      * 测试FastJson可以将反序列化从文件读出的部分
+     * @throws IOException IO异常
      */
     @Test
     public void test3() throws IOException {

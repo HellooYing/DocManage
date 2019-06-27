@@ -18,7 +18,7 @@ import static com.NeuDocManage.service.INodeServie.getIndexBlock;
 public class DirService {
     /**
      * 该目录是否可访问，包括目录存在性验证、权限验证
-     * @param dir
+     * @param dir 目录地址
      * @return 是或否
      */
     public static boolean canViewDir(String dir){
@@ -54,7 +54,7 @@ public class DirService {
 
     /**
      * 目录是否允许写入（create、mkdir等）
-     * @param dir
+     * @param dir 目录地址
      * @return 是否
      */
     public static boolean canWriteDir(String dir){
@@ -89,7 +89,7 @@ public class DirService {
 
     /**
      * 获取目录对当前用户的权限
-     * @param node
+     * @param node 内存节点
      * @return Permissions
      */
     public static Permissions getDirPermissions(INode node){
@@ -130,7 +130,7 @@ public class DirService {
     }
     /**
      * 根据某个I结点编号返回它的格式化信息
-     * @param inodeId
+     * @param inodeId 内存节点id
      */
     public static void showInfo(int inodeId) {
         IndexNode inode = JSON.parseObject(readBlock(inodeId).trim(), IndexNode.class);
@@ -378,7 +378,7 @@ public class DirService {
 
     /**
      * 格式化输出路径下的文件信息
-     * @param dirName
+     * @param dirName 目录名
      */
     public static void ListInfo(String dirName){
 

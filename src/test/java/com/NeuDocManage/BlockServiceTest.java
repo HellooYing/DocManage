@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 public class BlockServiceTest {
     /**
      * 测试formatBlock,writeBlock,overwriteBlock,readBlock四个底层io函数
-     * @throws IOException
+     * @throws IOException IO异常
      */
     @Test
     public void test1() throws IOException {

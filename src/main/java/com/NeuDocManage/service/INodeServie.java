@@ -28,7 +28,7 @@ public class INodeServie {
 
     /**
      * 回收一个索引块
-     * @param blockId
+     * @param blockId 索引块id
      */
     public static void recoverIndexBlock(int blockId){
         if(blockId>=INODEBLOCKSTART+INODEBLOCKNUM-1){
@@ -64,7 +64,7 @@ public class INodeServie {
 
     /**
      * 关闭时保存索引块分配栈
-     * @return
+     * @return 状态码
      */
     public static int saveStack(){
         if(blockStack==null||blockStack.size()==0) return 0;
