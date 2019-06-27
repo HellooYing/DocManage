@@ -315,6 +315,10 @@ public class FileService {
         int curDir = changeDir(dirName).getId();
         fileName = subdir[subdir.length-1];
 
+        if(findSubFile(curDir,fileName) != -1){
+            return -2; //不能同名
+        }
+
         //对应create函数
         int inodeNum = getIndexBlock(); //申请一个空闲i节点
         int dataBlockNum = getDataBlock(); //申请一个空闲数据块
@@ -381,7 +385,7 @@ public class FileService {
             if(nowInode.getFileName().equals(fileName)){
                 //找到同名文件
                 headId = nowInode.getId(); //headId表示文件的I结点了
-                System.out.println("headId: "+headId);
+                //System.out.println("headId: "+headId);
                 fileId = nowInode.getIndirectData();
                 //找到这个文件结尾的Id
                 DataBlock nowData = JSON.parseObject(readBlock(fileId).trim(), DataBlock.class);
@@ -427,9 +431,9 @@ public class FileService {
             nowData.setNextDataId(newData);
         }
         nowData.setData(contents.get(0)); //替换数据
-        System.out.println("Write in:"+fileId+"\n"+JSON.toJSONString(nowData));
+        //System.out.println("Write in:"+fileId+"\n"+JSON.toJSONString(nowData));
         overwriteBlock(fileId,JSON.toJSONString(nowData)); //写入
-        System.out.println("length: "+JSON.toJSONString(nowData).length());
+        //System.out.println("length: "+JSON.toJSONString(nowData).length());
 
         for (int i = 1; i < contents.size(); i++) {
             String nowContent = contents.get(i);
@@ -458,7 +462,8 @@ public class FileService {
         nowData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
         int _size = 512*(contents.size()-1)+contents.get(contents.size()-1).length()+48;
         nowInode.setSize(_size); //设置好内存大小
-        System.out.println(JSON.toJSONString(nowInode)+"\nwith change\n"+JSON.toJSONString(nowData));
+        nowInode.setChangeTime(new Date()); //修改时间
+        //System.out.println(JSON.toJSONString(nowInode)+"\nwith change\n"+JSON.toJSONString(nowData));
         overwriteBlock(headId,JSON.toJSONString(nowInode));
         //级联修改所有父目录大小
         INode inode = getINodeById(nowInode.getId(),root);
@@ -466,7 +471,7 @@ public class FileService {
         while(inode.getId() != root.getId()){
             father = new IndexNode(inode.getFather());
             father.setSize(father.getSize()+_size);
-            System.out.println("fq"+father.getId()+"\n"+JSON.toJSONString(father).length());
+            //System.out.println("fq"+father.getId()+"\n"+JSON.toJSONString(father).length());
             overwriteBlock(father.getId(),JSON.toJSONString(father));
             father = JSON.parseObject(readBlock(father.getId()).trim(), IndexNode.class);
             inode = getINodeById(father.getId(),root);
@@ -599,5 +604,24 @@ public class FileService {
         node.addMode(p);
         IndexNode indexNode=new IndexNode(node);
         overwriteBlock(indexNode.getId(),JSON.toJSONString(indexNode));
+    }
+
+    private static int findSubFile(int dirId, String FileName){
+        //找一个目录的子文件
+        //System.out.println(dirName);
+        IndexNode nowInode = JSON.parseObject(readBlock(dirId).trim(), IndexNode.class);
+        DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DirBlock.class);
+        if(nowDir.getSonDataId().size() == 0){
+            return -1; //没有
+        }else{
+            for(Integer x : nowDir.getSonDataId()){
+                nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
+                //DataBlock nowData = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DataBlock.class);
+                if(nowInode.getType() == 2&&nowInode.getFileName().equals(FileName)){
+                    return nowInode.getId();
+                }
+            }
+            return -1; //没有
+        }
     }
 }
