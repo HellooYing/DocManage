@@ -1,6 +1,7 @@
 package com.NeuDocManage;
 
 import com.NeuDocManage.model.HostHolder;
+import com.NeuDocManage.model.INode;
 import com.NeuDocManage.model.IndexNode;
 import com.NeuDocManage.model.User;
 
@@ -41,8 +42,11 @@ public class DocManageApplication {
         }
         System.out.println("您好，用户root。现在时间是"+new Date()+",输入help可获取指令列表。");
         while (true){
-            String cur=getFullName(getINodeById(getCurDir().getId(),root));
-            System.out.print("root@docManage:"+cur+"#");
+            int curId=getCurDir().getId();
+            INode curNode=getINodeById(curId,root);
+            String cur=getFullName(curNode);
+            String username=HostHolder.getUser().getUserName();
+            System.out.print(username+"@docManage:"+cur+"#");
             input=scanner.nextLine().toLowerCase();
             String order=input.trim().split(" ")[0];
             String[] word;
@@ -111,7 +115,8 @@ public class DocManageApplication {
                     else{//有目录参数的话，检测是否有权限访问该目录，ls该目录的内容
                         if(canViewDir(word[1])){
                             IndexNode now=getCurDir();
-                            setCurDir(changeDir(word[1]));
+                            IndexNode go=changeDir(word[1]);
+                            setCurDir(go);
                             ListInfo("");
                             setCurDir(now);
                         }
@@ -127,7 +132,8 @@ public class DocManageApplication {
                         break;
                     }
                     if(canViewDir(word[1])){
-                        setCurDir(changeDir(word[1]));
+                        IndexNode go=changeDir(word[1]);
+                        setCurDir(go);
                     }
                     break;
                 case "mkdir":

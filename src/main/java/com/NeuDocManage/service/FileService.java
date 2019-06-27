@@ -10,6 +10,7 @@ import java.util.List;
 import static com.NeuDocManage.config.MainConfig.BLOCKNUM;
 import static com.NeuDocManage.config.MainConfig.INODEBLOCKSTART;
 import static com.NeuDocManage.model.HostHolder.getCurDir;
+import static com.NeuDocManage.model.HostHolder.setCurDir;
 import static com.NeuDocManage.service.BlockService.*;
 import static com.NeuDocManage.service.BlockService.readBlock;
 import static com.NeuDocManage.service.DataService.getDataBlock;
@@ -97,15 +98,30 @@ public class FileService {
      * @return
      */
     public static INode findFileOnCur(String fileName){
+        String[] fileDir=fileName.split("/");
+        IndexNode now=HostHolder.getCurDir();
+        if(fileDir.length!=1){
+            for (int i = 0; i <fileDir.length-1 ; i++) {
+                setCurDir(changeDir(fileDir[i]));
+            }
+            fileName=fileDir[fileDir.length-1];
+        }
         INode cur = getCurDir();
         List<INode> file=cur.getFileSon();
         List<INode> dir=cur.getDirSon();
         for(INode iNode:file){
-            if(iNode.getFileName().equals(fileName)) return iNode;
+            if(iNode.getFileName().equals(fileName)) {
+                HostHolder.setCurDir(now);
+                return iNode;
+            }
         }
         for(INode iNode:dir){
-            if(iNode.getFileName().equals(fileName)) return iNode;
+            if(iNode.getFileName().equals(fileName)){
+                HostHolder.setCurDir(now);
+                return iNode;
+            }
         }
+        HostHolder.setCurDir(now);
         return null;
     }
 
