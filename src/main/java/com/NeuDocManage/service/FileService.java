@@ -14,6 +14,7 @@ import static com.NeuDocManage.service.BlockService.*;
 import static com.NeuDocManage.service.BlockService.readBlock;
 import static com.NeuDocManage.service.DataService.getDataBlock;
 import static com.NeuDocManage.service.DataService.recoverDataBlock;
+import static com.NeuDocManage.service.DirService.changeDir;
 import static com.NeuDocManage.service.INodeServie.getIndexBlock;
 import static com.NeuDocManage.service.INodeServie.recoverIndexBlock;
 
@@ -299,6 +300,15 @@ public class FileService {
     //文件有关操作
     public static int createFile(String fileName) {
         //创建一个文件,返回的是该文件的i节点号(创建失败返回BLOCKNUM - 1)
+
+        String[] subdir = fileName.split("\\/");
+        String dirName = fileName.replaceFirst(subdir[subdir.length-1],"");
+        if(changeDir(dirName) == null){
+            return -1;
+        }
+        int curDir = changeDir(dirName).getId();
+        fileName = subdir[subdir.length-1];
+
         //对应create函数
         int inodeNum = getIndexBlock(); //申请一个空闲i节点
         int dataBlockNum = getDataBlock(); //申请一个空闲数据块
@@ -325,15 +335,15 @@ public class FileService {
         DataBlock dataBlock = new DataBlock();
         dataBlock.setData("");
         dataBlock.setNextDataId(BLOCKNUM - 1);   //表示没有
-        dataBlock.setFaDirID(getCurDir().getId()); //设置父亲的目录
+        dataBlock.setFaDirID(curDir); //设置父亲的目录
 
         //寻找父亲目录的子目录最后一个，添加到尾部
-        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+        IndexNode nowInode = JSON.parseObject(readBlock(curDir).trim(), IndexNode.class);
         DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DirBlock.class);
         List<Integer> sons = nowDir.getSonDataId();
         sons.add(inodeNum);
         nowDir.setSonDataId(sons);
-        overwriteBlock(getCurDir().getIndirectData(),JSON.toJSONString(nowDir));//写回
+        overwriteBlock(nowInode.getIndirectData(),JSON.toJSONString(nowDir));//写回
 
         dataBlock.setUsed(true);
 
@@ -347,10 +357,18 @@ public class FileService {
     public static boolean writeFile(String fileName,String content){
         //往文件里头写东西
 
+        String[] subdir = fileName.split("\\/");
+        String dirName = fileName.replaceFirst(subdir[subdir.length-1],"");
+        if(changeDir(dirName) == null){
+            return false;
+        }
+        int curDir = changeDir(dirName).getId();
+        fileName = subdir[subdir.length-1];
+
         //首先找到这个文件
         int fileId = -1;
         int headId = -1; //表示这个文件的头Id
-        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+        IndexNode nowInode = JSON.parseObject(readBlock(curDir).trim(), IndexNode.class);
         DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DirBlock.class);
         for(Integer x : nowDir.getSonDataId()){
             nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
@@ -457,8 +475,17 @@ public class FileService {
 
     public static String readFile(String fileName){
         //读当前目录下的某个文件,返回文件内容
+
+        String[] subdir = fileName.split("\\/");
+        String dirName = fileName.replaceFirst(subdir[subdir.length-1],"");
+        if(changeDir(dirName) == null){
+            return "";
+        }
+        int curDir = changeDir(dirName).getId();
+        fileName = subdir[subdir.length-1];
+
         //找子目录
-        IndexNode nowInode = JSON.parseObject(readBlock(getCurDir().getId()).trim(), IndexNode.class);
+        IndexNode nowInode = JSON.parseObject(readBlock(curDir).trim(), IndexNode.class);
         DirBlock nowDir = JSON.parseObject(readBlock(nowInode.getIndirectData()).trim(), DirBlock.class);
         for(Integer x : nowDir.getSonDataId()){
             nowInode = JSON.parseObject(readBlock(x).trim(), IndexNode.class);
