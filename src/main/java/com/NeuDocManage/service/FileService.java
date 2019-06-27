@@ -122,6 +122,7 @@ public class FileService {
         fullName=fullName.substring(1);
         String[] names=fullName.split("/");
         if(root==null) getTree();
+        if(fullName.equals("/root")) return root;
         INode node=root;
         for (int i = 1; i <names.length-1 ; i++) {
             String dir=names[i];
