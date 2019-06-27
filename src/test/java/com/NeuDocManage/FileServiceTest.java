@@ -69,4 +69,9 @@ public class FileServiceTest {
         System.out.println(getFullName(findFileByFullName("/root/hhh")));
         System.out.println(getINodeById(2,root));
     }
+    @Test
+    public void test4() throws IOException, InterruptedException {
+        initDisk();
+        vim("1");
+    }
 }

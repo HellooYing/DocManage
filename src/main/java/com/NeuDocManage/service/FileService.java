@@ -3,6 +3,9 @@ package com.NeuDocManage.service;
 import com.NeuDocManage.model.*;
 import com.alibaba.fastjson.JSON;
 
+import java.io.*;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -260,7 +263,7 @@ public class FileService {
         if(node==null) return false;
         if(node.getType()==1&&(node.getFileSon().size()!=0||node.getDirSon().size()!=0)){
             //如果该文件是目录，且子目录或子文件不为0，则无法删除
-            System.out.println("该目录下有其他文件，需要通过 del -r <filename> 递归删除");
+            System.out.println("该目录下有其他文件，需要通过 rm -r <filename> 递归删除");
             return false;
         }
         updateFatherForDelete(node);
@@ -695,6 +698,30 @@ public class FileService {
                 }
             }
             return -1; //没有
+        }
+    }
+
+    public static void vim(String file) throws IOException, InterruptedException {
+        INode node;
+        if(file.substring(0,1).equals("/")) node=findFileByFullName(file);
+        else node=findFileOnCur(file);
+        if(node==null){
+            System.out.println("找不到该文件！");
+            return;
+        }
+        String content=readFile(file);
+        try {
+            PrintWriter out=new PrintWriter("tmp.txt");
+            out.write(content);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            Process process = Runtime.getRuntime().exec("cmd.exe  /c notepad tmp.txt");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

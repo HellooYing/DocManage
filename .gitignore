@@ -1,6 +1,7 @@
 /bin/
 /target/
 disk.txt
+tmp.txt
 /out/
 ### STS ###
 .apt_generated
