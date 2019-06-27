@@ -58,6 +58,10 @@ public class IndexNode extends Block{
         this.indirectData=inode.getIndirectData();
     }
 
+    public void addMode(Permissions permissions){
+        mode.add(permissions);
+    }
+
     public int getId() {
         return id;
     }

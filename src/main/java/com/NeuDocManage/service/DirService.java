@@ -1,9 +1,6 @@
 package com.NeuDocManage.service;
 
-import com.NeuDocManage.model.DataBlock;
-import com.NeuDocManage.model.DirBlock;
-import com.NeuDocManage.model.HostHolder;
-import com.NeuDocManage.model.IndexNode;
+import com.NeuDocManage.model.*;
 import com.alibaba.fastjson.JSON;
 import javafx.util.Pair;
 
@@ -15,10 +12,100 @@ import static com.NeuDocManage.config.MainConfig.*;
 import static com.NeuDocManage.model.HostHolder.getCurDir;
 import static com.NeuDocManage.service.BlockService.*;
 import static com.NeuDocManage.service.DataService.getDataBlock;
-import static com.NeuDocManage.service.FileService.getTree;
+import static com.NeuDocManage.service.FileService.*;
 import static com.NeuDocManage.service.INodeServie.getIndexBlock;
 
 public class DirService {
+    public static boolean canViewDir(String dir){
+        INode node=dirLegality(dir);
+        String now=HostHolder.getUser().getUserName();
+        // 权限是否符合
+        // 如果当前用户是root或目录创建者，则肯定可以访问
+        if(now.equals(node.getCreator())||now.equals("root")){
+            return true;
+        }
+        // 否则查询目录的mode
+        else if(node.getMode().size()==0){
+            System.out.println("无权限访问该目录！");
+            return false;
+        }
+        else{
+            Permissions myPermissions=getDirPermissions(node);
+            if(myPermissions==null){
+                System.out.println("无权限访问该目录！");
+                return false;
+            }
+            else{
+                if(myPermissions.canRead()) return true;
+                else {
+                    System.out.println("无权限访问该目录！");
+                    return false;
+                }
+            }
+        }
+    }
+    public static boolean canWriteDir(String dir){
+        INode node=dirLegality(dir);
+        String now=HostHolder.getUser().getUserName();
+        if(node==null) return false;
+        // 权限是否符合
+        // 如果当前用户是root或目录创建者，则肯定可以访问
+        if(now.equals(node.getCreator())||now.equals("root")){
+            return true;
+        }
+        // 否则查询目录的mode
+        else if(node.getMode().size()==0){
+            System.out.println("无权限写入该目录！");
+            return false;
+        }
+        else{
+            Permissions myPermissions=getDirPermissions(node);
+            if(myPermissions==null){
+                System.out.println("无权限写入该目录！");
+                return false;
+            }
+            else{
+                if(myPermissions.canRead()&&myPermissions.canWrite()) return true;
+                else {
+                    System.out.println("无权限写入该目录！");
+                    return false;
+                }
+            }
+        }
+    }
+
+    public static Permissions getDirPermissions(INode node){
+        Permissions myPermissions=null;
+        String now=HostHolder.getUser().getUserName();
+        for(Permissions p:node.getMode()){
+            if(now.equals(p.getUserName())) myPermissions=p;
+            break;
+        }
+        if(myPermissions==null){
+            for(Permissions p:node.getMode()){
+                if(p.getUserName()==null) myPermissions=p;
+                break;
+            }
+        }
+        return myPermissions;
+    }
+
+    private static INode dirLegality(String dir){
+        INode node;
+        if(dir.substring(0,1).equals("/")) node=findFileByFullName(dir);// 如果fileName是文件全名
+        else node=findFileOnCur(dir);// 否则就在当前目录查询
+        if(node==null){
+            System.out.println("找不到该目录！");
+            return null;
+        }
+        // 是否为目录
+        if(node.getType()!=1){
+            System.out.println("输入非目录，无法访问");
+            return null;
+        }
+        return node;
+    }
+
     public static void showInfo(int inodeId) {
         IndexNode inode = JSON.parseObject(readBlock(inodeId).trim(), IndexNode.class);
         System.out.println( "Name: "+inode.getFileName()+"\t"+
