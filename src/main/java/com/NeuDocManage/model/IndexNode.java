@@ -56,6 +56,7 @@ public class IndexNode extends Block{
         this.changeTime = inode.getChangeTime();
         this.offset = inode.getOffset();
         this.indirectData=inode.getIndirectData();
+        this.mode=inode.getMode(); //权限
     }
 
     public void addMode(Permissions permissions){
@@ -80,10 +81,6 @@ public class IndexNode extends Block{
 
     public List<Permissions> getMode() {
         return mode;
-    }
-
-    public void setMode(List<Permissions> mode) {
-        this.mode = mode;
     }
 
     public boolean isUsed() {

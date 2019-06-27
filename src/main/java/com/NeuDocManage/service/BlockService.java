@@ -38,6 +38,12 @@ public class BlockService {
         return overwriteBlock(blockId,content);
     }
 
+    /**
+     * 覆盖重写盘块
+     * @param blockId
+     * @param content
+     * @return 状态码
+     */
     public static int overwriteBlock(int blockId,String content){
         if(content.length()>BLOCKSIZE) return 2;// content比块大，不能写入
         formatBlock(blockId);

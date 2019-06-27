@@ -62,6 +62,10 @@ public class INodeServie {
         return 0;//正常返回
     }
 
+    /**
+     * 关闭时保存索引块分配栈
+     * @return
+     */
     public static int saveStack(){
         if(blockStack==null||blockStack.size()==0) return 0;
         int blockId=blockStack.pop();
@@ -77,6 +81,9 @@ public class INodeServie {
         }
     }
 
+    /**
+     * 初始化索引块分配栈
+     */
     public static void initIndexBlockStack(){
         blockStack=new Stack<Integer>();
         int firstIndexBlock= superBlock.getEmptyIndexBlock();

@@ -29,6 +29,12 @@ public class FileService {
         root=JSON.parseObject(readBlock(INODEBLOCKSTART).trim(),INode.class);
         getSon(root);
     }
+
+    /**
+     * 获取内存i节点的儿子节点
+     * 可递归
+     * @param node
+     */
     private static void getSon(INode node){
         DirBlock node2=JSON.parseObject(readBlock(node.getIndirectData()).trim(),DirBlock.class);
         for(int i:node2.getSonDataId()){
@@ -320,7 +326,7 @@ public class FileService {
             recoverDataBlock(i);//回收数据块
         }
     }
-    //文件有关操作
+
     /**
      * 创建一个文件
      * @param fileName
@@ -387,7 +393,7 @@ public class FileService {
     }
 
     /**
-     * 往文件里头写东西
+     * 往文件里写入内容
      * @param fileName
      * @param content
      * @return 成功返回true失败返回false
@@ -549,9 +555,16 @@ public class FileService {
         }
         return null; //没找到
     }
-    public static boolean canViewFile(String file){	//    boolean rename(String oldName, String newName){
-        INode node=fileLegality(file);	//
-        String now=HostHolder.getUser().getUserName();	//    }
+
+    /**
+     * 文件是否可读
+     * @param file
+     * @return 是否
+     */
+    public static boolean canViewFile(String file){
+        INode node=fileLegality(file);
+        String now=HostHolder.getUser().getUserName();
+        if(node==null) return false;
         // 权限是否符合
         if(now.equals(node.getCreator())||now.equals("root")){
             return true;
@@ -575,6 +588,12 @@ public class FileService {
             }
         }
     }
+
+    /**
+     * 文件是否可写
+     * @param file
+     * @return 是否
+     */
     public static boolean canWriteFile(String file){
         INode node=fileLegality(file);
         String now=HostHolder.getUser().getUserName();
@@ -603,10 +622,20 @@ public class FileService {
         }
     }
 
+    /**
+     * 文件对当前用户的权限
+     * @param node
+     * @return 权限
+     */
     private static Permissions getFilePermissions(INode node){
         return getDirPermissions(node);
     }
 
+    /**
+     * 文件地址合法性验证
+     * @param file
+     * @return 合法文件的内存i节点或null
+     */
     private static INode fileLegality(String file){
         INode node;
         if(file.substring(0,1).equals("/")) node=findFileByFullName(file);// 如果fileName是文件全名
@@ -623,6 +652,11 @@ public class FileService {
         return node;
     }
 
+    /**
+     * 修改文件对其他用户的权限
+     * @param fileName
+     * @param param
+     */
     public static void chmod(String fileName,String param){
         INode node;
         if(fileName.substring(0,1).equals("/")) node=findFileByFullName(fileName);//如果fileName是文件全名

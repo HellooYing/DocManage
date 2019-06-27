@@ -38,6 +38,11 @@ public class UserService {
         }
     }
 
+    /**
+     * useradd xxx 注册用户
+     * @param user
+     * @return 成功与否
+     */
     public static boolean register(User user){
         User user2=findUser(user.getUserName());
         if(user2!=null){//如果已存在该用户名，注册失败
@@ -53,6 +58,11 @@ public class UserService {
         return true;
     }
 
+    /**
+     * 删除用户
+     * @param userName
+     * @return 成功与否
+     */
     public static boolean deleteUser(String userName){
         if(userName.equals("root")){
             System.out.println("root用户无法被删除！");
@@ -75,6 +85,10 @@ public class UserService {
         return true;//没有这个用户也返回true
     }
 
+    /**
+     * 获取一个用户区的盘块以存储新用户的信息
+     * @return
+     */
     private static int getUserBlock(){
         for (int i = USERBLOCKSTART; i <USERBLOCKSTART+USERBLOCKNUM ; i++) {
             String userBlockContent = readBlock(i).trim();
@@ -83,10 +97,19 @@ public class UserService {
         return -1;
     }
 
+    /**
+     * 回收用户盘块
+     * @param blockId
+     */
     private static void recoverUserBlock(int blockId){
         formatBlock(blockId);
     }
 
+    /**
+     * 根据用户名获取User类型用户
+     * @param userName
+     * @return
+     */
     private static User findUser(String userName){
         boolean userExist=false;
         User user=null;
@@ -102,15 +125,4 @@ public class UserService {
         if(userExist) return user;
         else return null;
     }
-
-
-//
-//    boolean TransUser(){
-//
-//    }
-    /*
-    User readUser(int blockId){
-        //根据blockId查询用户信息
-    }
-    */
 }

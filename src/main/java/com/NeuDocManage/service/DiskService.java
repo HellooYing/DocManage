@@ -78,6 +78,9 @@ public class DiskService {
         FileService.getTree();
     }
 
+    /**
+     * 关闭时保存现场，将未分配的盘块从栈中写入磁盘
+     */
     public static void releaseDisk(){
         int emptyFileBlock=DataService.saveStack();
         if(emptyFileBlock!=0) superBlock.setEmptyFileBlock(emptyFileBlock);

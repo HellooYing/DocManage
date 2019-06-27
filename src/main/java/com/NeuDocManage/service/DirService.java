@@ -16,8 +16,13 @@ import static com.NeuDocManage.service.FileService.*;
 import static com.NeuDocManage.service.INodeServie.getIndexBlock;
 
 public class DirService {
+    /**
+     * 该目录是否可访问，包括目录存在性验证、权限验证
+     * @param dir
+     * @return 是或否
+     */
     public static boolean canViewDir(String dir){
-        if(dir.equals("..")) return true;
+        if(dir.equals("..")&&HostHolder.getCurDir().getId()!=INODEBLOCKSTART) return true;//非根目录的返回上一目录无条件允许
         INode node=dirLegality(dir);
         String now=HostHolder.getUser().getUserName();
         if(node==null) return false;
@@ -46,6 +51,12 @@ public class DirService {
             }
         }
     }
+
+    /**
+     * 目录是否允许写入（create、mkdir等）
+     * @param dir
+     * @return 是否
+     */
     public static boolean canWriteDir(String dir){
         INode node=dirLegality(dir);
         String now=HostHolder.getUser().getUserName();
@@ -76,6 +87,11 @@ public class DirService {
         }
     }
 
+    /**
+     * 获取目录对当前用户的权限
+     * @param node
+     * @return Permissions
+     */
     public static Permissions getDirPermissions(INode node){
         Permissions myPermissions=null;
         String now=HostHolder.getUser().getUserName();
@@ -92,6 +108,11 @@ public class DirService {
         return myPermissions;
     }
 
+    /**
+     * 输入地址合法性验证
+     * @param dir
+     * @return 合法地址的INode或null
+     */
     private static INode dirLegality(String dir){
         INode node;
         if(dir.substring(0,1).equals("/")) node=findFileByFullName(dir);// 如果fileName是文件全名
