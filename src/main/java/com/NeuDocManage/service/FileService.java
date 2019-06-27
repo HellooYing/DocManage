@@ -533,9 +533,95 @@ public class FileService {
         }
         return null; //没找到
     }
-//    boolean rename(String oldName, String newName){
-//
-//    }
+    public static boolean canViewFile(String file){	//    boolean rename(String oldName, String newName){
+        INode node=fileLegality(file);	//
+        String now=HostHolder.getUser().getUserName();	//    }
+        // 权限是否符合
+        if(now.equals(node.getCreator())||now.equals("root")){
+            return true;
+        }
+        else if(node.getMode().size()==0){
+            System.out.println("无权限访问该文件！");
+            return false;
+        }
+        else{
+            Permissions myPermissions=getFilePermissions(node);
+            if(myPermissions==null){
+                System.out.println("无权限访问该文件！");
+                return false;
+            }
+            else{
+                if(myPermissions.canRead()) return true;
+                else {
+                    System.out.println("无权限访问该文件！");
+                    return false;
+                }
+            }
+        }
+    }
+    public static boolean canWriteFile(String file){
+        INode node=fileLegality(file);
+        String now=HostHolder.getUser().getUserName();
+        if(node==null) return false;
+        // 权限是否符合
+        if(now.equals(node.getCreator())||now.equals("root")){
+            return true;
+        }
+        else if(node.getMode().size()==0){
+            System.out.println("无权限写入该文件！");
+            return false;
+        }
+        else{
+            Permissions myPermissions=getFilePermissions(node);
+            if(myPermissions==null){
+                System.out.println("无权限写入该文件！");
+                return false;
+            }
+            else{
+                if(myPermissions.canRead()&&myPermissions.canWrite()) return true;
+                else {
+                    System.out.println("无权限写入该文件！");
+                    return false;
+                }
+            }
+        }
+    }
+
+    private static Permissions getFilePermissions(INode node){
+        return getDirPermissions(node);
+    }
+
+    private static INode fileLegality(String file){
+        INode node;
+        if(file.substring(0,1).equals("/")) node=findFileByFullName(file);// 如果fileName是文件全名
+        else node=findFileOnCur(file);// 否则就在当前目录查询
+        if(node==null){
+            System.out.println("找不到该文件！");
+            return null;
+        }
+//        // 是否为文件
+//        if(node.getType()!=2){
+//            System.out.println("输入非文件，无法访问");
+//            return null;
+//        }
+        return node;
+    }
+
+    public static void chmod(String fileName,String param){
+        INode node;
+        if(fileName.substring(0,1).equals("/")) node=findFileByFullName(fileName);//如果fileName是文件全名
+        else node=findFileOnCur(fileName);//否则就在当前目录查询
+        if(node==null){
+            System.out.println("文件不存在！");
+            return;
+        }
+        if(param.substring(0,1).equals("-")) param=param.substring(1);
+        Permissions p=new Permissions();
+        p.chmod(param);
+        node.addMode(p);
+        IndexNode indexNode=new IndexNode(node);
+        overwriteBlock(indexNode.getId(),JSON.toJSONString(indexNode));
+    }
 
     /**
      * 找路径下是否存在子文件
