@@ -219,7 +219,7 @@ public class DirService {
         //System.out.println(JSON.toJSONString(sonDir));
         nowDir.setSonDirId(sonDir);
         //System.out.println(getCurDir().getIndirectData());
-        overwriteBlock(getCurDir().getIndirectData(),JSON.toJSONString(nowDir));
+        overwriteBlock(nowInode.getIndirectData(),JSON.toJSONString(nowDir));
 
 
 
@@ -296,7 +296,7 @@ public class DirService {
         if(dirName.equals("")){
             return getCurDir();
         }
-        int cur = SUPERBLOCKSTART+SUPERBLOCKNUM; //默认从root开始解析
+        int cur = getCurDir().getId(); //默认从当前目录开始解析
         String subDir[] = dirName.split("\\/");
         if(!subDir[0].equals(".") && !subDir[0].equals("..")) {
             if(!subDir[0].equals("root") &&(subDir.length > 1 &&!subDir[1].equals("root"))) {
