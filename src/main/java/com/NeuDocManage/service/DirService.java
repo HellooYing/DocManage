@@ -137,7 +137,7 @@ public class DirService {
         if(dirName.getKey().equals("")){
             return dirName;
         }
-        System.out.println(dirName.getKey()+" "+dirName.getValue());
+        //System.out.println(dirName.getKey()+" "+dirName.getValue());
         if(dirName.getKey() == -1){
             return dirName; //出错了
         }else if(dirName.getValue().equals( "\\/")){
@@ -201,7 +201,7 @@ public class DirService {
             }
             //System.out.println("Fuck!!!");
             dirName = dirName.replaceFirst("\\/root\\/","");
-            System.out.println(dirName);
+            //System.out.println(dirName);
         }else if(subDir[0].equals(".")){
             cur = getCurDir().getId();
         }else{
