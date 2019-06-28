@@ -305,7 +305,7 @@ public class DocManageApplication {
                 case "vim":
                     word=input.split(" ");
                     if(word.length!=2){
-                        System.out.println("userdel参数不合法");
+                        System.out.println("vim参数不合法");
                         break;
                     }
                     vim(word[1]);
